@@ -323,7 +323,8 @@ class TestEndToEnd:
 
             if should_change:
                 assert before_content != after_content, (
-                    f'Expected changes for {filename} but before/after are identical'
+                    f'Expected changes for {filename} but before/after'
+                    ' are identical'
                 )
             else:
                 assert before_content == after_content, (

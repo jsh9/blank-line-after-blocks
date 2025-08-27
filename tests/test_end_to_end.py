@@ -309,13 +309,13 @@ class TestEndToEnd:
             ('edge_cases.py', True),  # Should have changes
         ]
 
-        for filename, should_change in test_pairs:
-            before_file = test_data_dir / 'before' / filename
-            after_file = test_data_dir / 'after' / filename
+        for fn, should_change in test_pairs:
+            before_file = test_data_dir / 'before' / fn
+            after_file = test_data_dir / 'after' / fn
 
             # Test that the before and after files exist
-            assert before_file.exists(), f'Before file missing: {filename}'
-            assert after_file.exists(), f'After file missing: {filename}'
+            assert before_file.exists(), f'Before file missing: {fn}'
+            assert after_file.exists(), f'After file missing: {fn}'
 
             # Test that the change expectation is correct
             before_content = before_file.read_text()
@@ -323,10 +323,9 @@ class TestEndToEnd:
 
             if should_change:
                 assert before_content != after_content, (
-                    f'Expected changes for {filename} but before/after'
-                    ' are identical'
+                    f'Expected changes for {fn} but before/after are identical'
                 )
             else:
                 assert before_content == after_content, (
-                    f'Expected no changes for {filename} but before/after differ'
+                    f'Expected no changes for {fn} but before/after differ'
                 )

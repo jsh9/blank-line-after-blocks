@@ -1,0 +1,12 @@
+- id: blank-line-after-blocks
+  name: Add blank lines after code blocks (in .py files)
+  description: Automatically add blank lines after if/for/while/with/try blocks to improve code readability.
+  entry: blank-line-after-blocks
+  language: python
+  types: [python]
+- id: blank-line-after-blocks-jupyter
+  name: Add blank lines after code blocks (in .ipynb files)
+  description: In Jupyter notebooks, automatically add blank lines after if/for/while/with/try blocks.
+  entry: blank-line-after-blocks-jupyter
+  language: python
+  files: '^.*\.ipynb$'

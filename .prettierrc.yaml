@@ -1,0 +1,6 @@
+printWidth: 79
+endOfLine: auto
+overrides:
+  - files: "*.md"
+    options:
+      proseWrap: always

@@ -1,0 +1,129 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "blank-line-after-blocks"
+version = "0.1.0"
+description = "A Python formatter to automatically add blank lines after if/for/while/with/try blocks"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+maintainers = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Quality Assurance",
+]
+keywords = ["formatter", "code-style", "blank-lines", "python"]
+requires-python = ">=3.10"
+dependencies = [
+    "jupyter-notebook-parser>=0.1.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov",
+    "mypy",
+    "pre-commit",
+    "tox",
+]
+lint = [
+    "flake8>=5.0",
+    "flake8-bugbear",
+    "flake8-comprehensions",
+    "flake8-eradicate",
+    "flake8-broken-line",
+    "flake8-quotes",
+    "flake8-debugger",
+    "flake8-length",
+    "flake8-clean-block",
+    "flake8-indent-in-def",
+    "flake8-picky-parentheses",
+    "flake8-implicit-str-concat",
+    "flake8-return",
+    "flake8-docstrings",
+]
+format = [
+    "muff",
+]
+
+[project.urls]
+Homepage = "https://github.com/jsh9/blank-line-after-blocks"
+Repository = "https://github.com/jsh9/blank-line-after-blocks.git"
+Issues = "https://github.com/jsh9/blank-line-after-blocks/issues"
+Changelog = "https://github.com/jsh9/blank-line-after-blocks/blob/main/CHANGELOG.md"
+
+[project.scripts]
+blank-line-after-blocks = "blank_line_after_blocks.main_py:main"
+blank-line-after-blocks-jupyter = "blank_line_after_blocks.main_jupyter:main"
+
+[tool.setuptools.packages.find]
+exclude = ["tests*", "testing*"]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
+# Test configuration
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--tb=short",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "integration: marks tests as integration tests",
+]
+
+[tool.mypy]
+strict = true
+exclude = "pydoclint/utils/unparser.py"
+
+[[tool.mypy.overrides]]
+module = "jupyter_notebook_parser"
+ignore_missing_imports = true
+
+# Flake8 configuration (using flake8 section for compatibility)
+[tool.flake8]
+max-line-length = 79
+extend-ignore = [
+    "E501",  # line length
+    "W503",  # line break before binary operator
+]
+count = true
+statistics = true
+max-complexity = 10
+exclude = [
+    ".*",
+    "build/*",
+    "venv/*",
+    "tests/test_data/*",
+]
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true

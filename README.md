@@ -27,8 +27,8 @@ Add this to your `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
-  - repo: https://github.com/your-username/blank-line-after-blocks
-    rev: v0.1.0
+  - repo: https://github.com/jsh9/blank-line-after-blocks
+    rev: 0.1.0
     hooks:
       - id: blank-line-after-blocks
       - id: blank-line-after-blocks-jupyter
@@ -47,30 +47,55 @@ This tool automatically adds one blank line after the end of:
 This improves code readability by providing visual separation between blocks
 and subsequent code.
 
-## Example
+## Examples
 
-**Before:**
+### Basic if and for blocks
 
-```python
-if condition:
-    do_something()
-next_statement()
+```diff
+  if condition:
+      do_something()
++
+  next_statement()
 
-for item in items:
-    process(item)
-final_step()
+  for item in items:
+      process(item)
++
+  final_step()
 ```
 
-**After:**
+### Try/except blocks with context managers
 
-```python
-if condition:
-    do_something()
+```diff
+  def process_files(filenames):
+      results = []
+      for filename in filenames:
+          try:
+              with open(filename) as f:
+                  data = json.load(f)
++
+              results.append(data)
+          except FileNotFoundError:
+              print(f'File {filename} not found')
+          except json.JSONDecodeError:
+              print(f'Invalid JSON in {filename}')
++
+      return results
+```
 
-next_statement()
+### Nested blocks in class methods
 
-for item in items:
-    process(item)
-
-final_step()
+```diff
+  class TestClass:
+      def method(self):
+          try:
+              if self.condition():
+                  with self.get_context():
+                      self.do_work()
++
+                  self.cleanup()
++
+          except Exception as e:
+              self.handle_error(e)
++
+          print('method complete')
 ```

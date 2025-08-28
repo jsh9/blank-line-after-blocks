@@ -59,7 +59,7 @@ class TestBaseFixer:
 
             assert result == 0
             assert len(fixer.processed_files) == 1
-            assert fixer.processed_files[0] == temp_filename
+            assert Path(fixer.processed_files[0]) == Path(temp_filename)
 
         finally:
             os.unlink(temp_filename)

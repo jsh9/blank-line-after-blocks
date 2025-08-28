@@ -24,7 +24,7 @@ class BaseFixer:
         filenames = sorted(path_obj.rglob('*.py'))
         all_status = set()
         for filename in filenames:
-            status = self.fix_one_file(filename)
+            status = self.fix_one_file(filename.as_posix())
             all_status.add(status)
 
         return 0 if not all_status or all_status == {0} else 1

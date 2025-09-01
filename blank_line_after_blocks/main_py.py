@@ -1,10 +1,10 @@
 # This file is inspired by
 # https://github.com/asottile/add-trailing-comma/blob/6be6dfc05176bddfc05176bddfc5a9c4bf0fd4941850f0fb41/add_trailing_comma/_main.py
 
-import argparse
 import sys
+from pathlib import Path
 
-from collections.abc import Sequence
+import click
 
 import blank_line_after_blocks.helper as helper
 from blank_line_after_blocks.base_fixer import BaseFixer
@@ -13,14 +13,20 @@ from blank_line_after_blocks.base_fixer import BaseFixer
 class PythonFileFixer(BaseFixer):
     """Fixer for Python source files."""
 
-    def __init__(self, path: str, cli_args: argparse.Namespace) -> None:
-        super().__init__(path=path, cli_args=cli_args)
+    def __init__(self, path: str, exclude_pattern: str = '') -> None:
+        super().__init__(path=path, exclude_pattern=exclude_pattern)
 
     def fix_one_file(self, filename: str) -> int:
         """Fix formatting in a single Python file."""
         if filename == '-':
             source_bytes = sys.stdin.buffer.read()
         else:
+            file_path = Path(filename)
+            if not file_path.is_file():
+                msg = f'{filename} is not a file (skipping)'
+                print(msg, file=sys.stderr)
+                return 0
+
             with open(filename, 'rb') as fb:
                 source_bytes = fb.read()
 
@@ -40,25 +46,26 @@ class PythonFileFixer(BaseFixer):
             with open(filename, 'wb') as f:
                 f.write(source_text.encode())
 
-        if self.cli_args.exit_zero_even_if_changed:
-            return 0
-
         return source_text != source_text_orig
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    """Provide main entry point for Python file formatting."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument('paths', nargs='*')
-    parser.add_argument('--exit-zero-even-if-changed', action='store_true')
-    args = parser.parse_args(argv)
-
+@click.command()
+@click.argument('paths', nargs=-1, type=click.Path())
+@click.option(
+    '--exclude',
+    type=str,
+    default='',
+    help='Regex pattern to exclude files/directories',
+)
+def main(paths: tuple[str, ...], exclude: str) -> None:
+    """Add blank lines after if/for/while/with/try blocks in Python files."""
     ret = 0
-    for path in args.paths:
-        fixer = PythonFileFixer(path=path, cli_args=args)
+    for path in paths:
+        fixer = PythonFileFixer(path=path, exclude_pattern=exclude)
         ret |= fixer.fix_one_directory_or_one_file()
 
-    return ret
+    if ret != 0:
+        raise SystemExit(ret)
 
 
 if __name__ == '__main__':

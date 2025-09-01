@@ -1,6 +1,5 @@
 """Tests for main_py.py module."""
 
-import argparse
 import pytest
 import tempfile
 import os
@@ -12,16 +11,9 @@ class TestPythonFileFixer:
     """Test the PythonFileFixer class."""
 
     @pytest.fixture
-    def mock_args(self):
-        """Create mock CLI arguments."""
-        args = argparse.Namespace()
-        args.exit_zero_even_if_changed = False
-        return args
-
-    @pytest.fixture
-    def fixer(self, mock_args):
+    def fixer(self):
         """Create a PythonFileFixer instance."""
-        return PythonFileFixer(path='test.py', cli_args=mock_args)
+        return PythonFileFixer(path='test.py')
 
     def test_fix_one_file_with_changes(self, fixer):
         """Test fix_one_file when changes are made to the file."""
@@ -75,28 +67,6 @@ class TestPythonFileFixer:
         finally:
             os.unlink(temp_filename)
 
-    def test_fix_one_file_exit_zero_even_if_changed(self, mock_args):
-        """Test fix_one_file with exit_zero_even_if_changed flag."""
-        mock_args.exit_zero_even_if_changed = True
-        fixer = PythonFileFixer(path='test.py', cli_args=mock_args)
-
-        input_code = 'if condition:\n    do_something()\nnext_line()'
-
-        with tempfile.NamedTemporaryFile(
-            mode='w', suffix='.py', delete=False
-        ) as f:
-            f.write(input_code)
-            temp_filename = f.name
-
-        try:
-            result = fixer.fix_one_file(temp_filename)
-
-            # Should return 0 even though changes were made
-            assert result == 0
-
-        finally:
-            os.unlink(temp_filename)
-
     @patch('sys.stdin')
     @patch('builtins.print')
     def test_fix_one_file_stdin(self, mock_print, mock_stdin, fixer):
@@ -142,7 +112,6 @@ class TestMainFunction:
         'argv,expected_paths',
         [
             (['file1.py', 'file2.py'], ['file1.py', 'file2.py']),
-            (['--exit-zero-even-if-changed', 'file1.py'], ['file1.py']),
             ([], []),
         ],
     )
@@ -155,7 +124,12 @@ class TestMainFunction:
             mock_fixer_instance = MockFixer.return_value
             mock_fixer_instance.fix_one_directory_or_one_file.return_value = 0
 
-            result = main(argv)
+            # Click's main() always calls sys.exit, even for successful runs
+            with pytest.raises(SystemExit) as exc_info:
+                main(argv)
+
+            # Should exit with 0 since no changes were made
+            assert exc_info.value.code == 0
 
             # Check that the correct number of fixers were created
             assert MockFixer.call_count == len(expected_paths)
@@ -165,25 +139,8 @@ class TestMainFunction:
                 args, kwargs = MockFixer.call_args_list[i]
                 assert kwargs['path'] == expected_path
 
-            # Should return 0 if no changes were made
-            assert result == 0
-
-    def test_main_exit_zero_flag(self):
-        """Test that the exit_zero_even_if_changed flag is passed correctly."""
-        with patch(
-            'blank_line_after_blocks.main_py.PythonFileFixer'
-        ) as MockFixer:
-            mock_fixer_instance = MockFixer.return_value
-            mock_fixer_instance.fix_one_directory_or_one_file.return_value = 0
-
-            main(['--exit-zero-even-if-changed', 'test.py'])
-
-            # Check that the flag was passed to the fixer
-            args, kwargs = MockFixer.call_args
-            assert kwargs['cli_args'].exit_zero_even_if_changed is True
-
     def test_main_returns_error_code(self):
-        """Test that main returns error code when changes are made."""
+        """Test that main raises SystemExit when changes are made."""
         with patch(
             'blank_line_after_blocks.main_py.PythonFileFixer'
         ) as MockFixer:
@@ -191,10 +148,11 @@ class TestMainFunction:
             mock_fixer_instance = MockFixer.return_value
             mock_fixer_instance.fix_one_directory_or_one_file.return_value = 1
 
-            result = main(['test.py'])
+            with pytest.raises(SystemExit) as exc_info:
+                main(['test.py'])
 
-            # Should return 1 when changes were made
-            assert result == 1
+            # Should raise SystemExit with code 1 when changes were made
+            assert exc_info.value.code == 1
 
     def test_main_multiple_files_mixed_results(self):
         """Test main with multiple files where some have changes and some don't."""
@@ -208,14 +166,18 @@ class TestMainFunction:
                 0,
             ]
 
-            result = main(['file1.py', 'file2.py'])
+            with pytest.raises(SystemExit) as exc_info:
+                main(['file1.py', 'file2.py'])
 
-            # Should return 1 if any file had changes (using bitwise OR)
-            assert result == 1
+            # Should raise SystemExit with code 1 if any file had
+            # changes (using bitwise OR)
+            assert exc_info.value.code == 1
 
     def test_main_no_arguments(self):
         """Test main with no file arguments."""
-        result = main([])
+        # Click's main() always calls sys.exit, even when no files processed
+        with pytest.raises(SystemExit) as exc_info:
+            main([])
 
-        # Should return 0 when no files are processed
-        assert result == 0
+        # Should exit with 0 when no files are processed (no changes made)
+        assert exc_info.value.code == 0

@@ -1,6 +1,5 @@
 """Tests for base_fixer.py module."""
 
-import argparse
 import pytest
 import tempfile
 import os
@@ -12,12 +11,9 @@ class ConcreteFixer(BaseFixer):
     """Concrete implementation of BaseFixer for testing."""
 
     def __init__(
-            self,
-            path: str,
-            cli_args: argparse.Namespace,
-            return_value: int = 0,
+            self, path: str, return_value: int = 0, exclude_pattern: str = ''
     ):
-        super().__init__(path, cli_args)
+        super().__init__(path, exclude_pattern=exclude_pattern)
         self.return_value = return_value
         self.processed_files = []
 
@@ -30,20 +26,12 @@ class ConcreteFixer(BaseFixer):
 class TestBaseFixer:
     """Test the BaseFixer base class."""
 
-    @pytest.fixture
-    def mock_args(self):
-        """Create mock CLI arguments."""
-        return argparse.Namespace()
-
-    def test_init(self, mock_args):
+    def test_init(self):
         """Test BaseFixer initialization."""
-        fixer = ConcreteFixer(
-            path='test.py', cli_args=mock_args, return_value=0
-        )
+        fixer = ConcreteFixer(path='test.py', return_value=0)
         assert fixer.path == 'test.py'
-        assert fixer.cli_args == mock_args
 
-    def test_fix_one_directory_or_one_file_single_file(self, mock_args):
+    def test_fix_one_directory_or_one_file_single_file(self):
         """Test fixing a single file."""
         with tempfile.NamedTemporaryFile(
             mode='w', suffix='.py', delete=False
@@ -52,9 +40,7 @@ class TestBaseFixer:
             temp_filename = f.name
 
         try:
-            fixer = ConcreteFixer(
-                path=temp_filename, cli_args=mock_args, return_value=0
-            )
+            fixer = ConcreteFixer(path=temp_filename, return_value=0)
             result = fixer.fix_one_directory_or_one_file()
 
             assert result == 0
@@ -64,7 +50,7 @@ class TestBaseFixer:
         finally:
             os.unlink(temp_filename)
 
-    def test_fix_one_directory_or_one_file_directory(self, mock_args):
+    def test_fix_one_directory_or_one_file_directory(self):
         """Test fixing all Python files in a directory."""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test files
@@ -84,9 +70,7 @@ class TestBaseFixer:
             with open(txt_file, 'w') as f:
                 f.write('not a python file')
 
-            fixer = ConcreteFixer(
-                path=temp_dir, cli_args=mock_args, return_value=0
-            )
+            fixer = ConcreteFixer(path=temp_dir, return_value=0)
             result = fixer.fix_one_directory_or_one_file()
 
             assert result == 0
@@ -108,7 +92,7 @@ class TestBaseFixer:
         ],
     )
     def test_fix_one_directory_or_one_file_directory_mixed_results(
-            self, mock_args, return_values, expected_result
+            self, return_values, expected_result
     ):
         """Test directory processing with mixed return values."""
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -122,8 +106,8 @@ class TestBaseFixer:
                 py_files.append(py_file)
 
             class MultiReturnFixer(BaseFixer):
-                def __init__(self, path, cli_args, return_values):
-                    super().__init__(path, cli_args)
+                def __init__(self, path, return_values):
+                    super().__init__(path)
                     self.return_values = return_values
                     self.call_count = 0
 
@@ -132,24 +116,24 @@ class TestBaseFixer:
                     return self.return_values[self.call_count - 1]
 
             fixer = MultiReturnFixer(
-                path=temp_dir, cli_args=mock_args, return_values=return_values
+                path=temp_dir, return_values=return_values
             )
             result = fixer.fix_one_directory_or_one_file()
 
             assert result == expected_result
 
-    def test_fix_one_file_not_implemented(self, mock_args):
+    def test_fix_one_file_not_implemented(self):
         """Test that BaseFixer.fix_one_file raises NotImplementedError."""
-        fixer = BaseFixer(path='test.py', cli_args=mock_args)
+        fixer = BaseFixer(path='test.py')
 
         with pytest.raises(
             NotImplementedError, match='Please implement this method'
         ):
             fixer.fix_one_file('test.py')
 
-    def test_fix_one_directory_or_one_file_nonexistent_path(self, mock_args):
+    def test_fix_one_directory_or_one_file_nonexistent_path(self):
         """Test behavior with non-existent path."""
-        fixer = ConcreteFixer(path='/nonexistent/path', cli_args=mock_args)
+        fixer = ConcreteFixer(path='/nonexistent/path')
 
         # This should not raise an exception, but behavior depends on
         # Path.is_file(). For non-existent paths, it will be treated as a
@@ -160,18 +144,16 @@ class TestBaseFixer:
         assert result == 0
         assert len(fixer.processed_files) == 0
 
-    def test_fix_one_directory_or_one_file_empty_directory(self, mock_args):
+    def test_fix_one_directory_or_one_file_empty_directory(self):
         """Test processing an empty directory."""
         with tempfile.TemporaryDirectory() as temp_dir:
-            fixer = ConcreteFixer(path=temp_dir, cli_args=mock_args)
+            fixer = ConcreteFixer(path=temp_dir)
             result = fixer.fix_one_directory_or_one_file()
 
             assert result == 0
             assert len(fixer.processed_files) == 0
 
-    def test_fix_one_directory_or_one_file_directory_no_python_files(
-            self, mock_args
-    ):
+    def test_fix_one_directory_or_one_file_directory_no_python_files(self):
         """Test directory with no Python files."""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create non-Python files
@@ -184,8 +166,84 @@ class TestBaseFixer:
             with open(js_file, 'w') as f:
                 f.write('also not python')
 
-            fixer = ConcreteFixer(path=temp_dir, cli_args=mock_args)
+            fixer = ConcreteFixer(path=temp_dir)
             result = fixer.fix_one_directory_or_one_file()
 
             assert result == 0
             assert len(fixer.processed_files) == 0
+
+    def test_exclude_functionality_with_regex_pattern(self):
+        """Test exclude functionality with regex pattern."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create test files
+            py_file1 = os.path.join(temp_dir, 'test_included.py')
+            py_file2 = os.path.join(temp_dir, 'test_excluded.py')
+
+            # Create subdirectory with Python file (should be excluded
+            # by pattern)
+            sub_dir = os.path.join(temp_dir, 'subdir')
+            os.makedirs(sub_dir)
+            py_file3 = os.path.join(sub_dir, 'test.py')
+
+            for py_file in [py_file1, py_file2, py_file3]:
+                with open(py_file, 'w') as f:
+                    f.write('# test content')
+
+            # Use regex pattern to exclude files with 'excluded' in
+            # name and 'subdir' directories
+            exclude_pattern = r'excluded|subdir'
+            fixer = ConcreteFixer(
+                path=temp_dir, return_value=0, exclude_pattern=exclude_pattern
+            )
+            result = fixer.fix_one_directory_or_one_file()
+
+            assert result == 0
+            # Only the included file should be processed
+            assert len(fixer.processed_files) == 1
+            processed_path = Path(fixer.processed_files[0])
+            assert processed_path.name == 'test_included.py'
+
+    def test_exclude_functionality_with_specific_patterns(self):
+        """Test exclude functionality with various regex patterns."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create test files
+            py_file1 = os.path.join(temp_dir, 'test_included.py')
+            py_file2 = os.path.join(temp_dir, 'test_cli_excluded.py')
+
+            for py_file in [py_file1, py_file2]:
+                with open(py_file, 'w') as f:
+                    f.write('# test content')
+
+            # Use regex pattern to exclude files with 'cli_excluded' in name
+            exclude_pattern = r'cli_excluded'
+            fixer = ConcreteFixer(
+                path=temp_dir, return_value=0, exclude_pattern=exclude_pattern
+            )
+            result = fixer.fix_one_directory_or_one_file()
+
+            assert result == 0
+            # Only the included file should be processed
+            assert len(fixer.processed_files) == 1
+            processed_path = Path(fixer.processed_files[0])
+            assert processed_path.name == 'test_included.py'
+
+    def test_exclude_patterns_empty(self):
+        """Test that empty exclude patterns work correctly."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Create test files
+            py_file1 = os.path.join(temp_dir, 'test1.py')
+            py_file2 = os.path.join(temp_dir, 'test2.py')
+
+            for py_file in [py_file1, py_file2]:
+                with open(py_file, 'w') as f:
+                    f.write('# test content')
+
+            # Empty exclude pattern should process all files
+            fixer = ConcreteFixer(
+                path=temp_dir, return_value=0, exclude_pattern=''
+            )
+            result = fixer.fix_one_directory_or_one_file()
+
+            assert result == 0
+            # Both files should be processed since exclude is empty
+            assert len(fixer.processed_files) == 2

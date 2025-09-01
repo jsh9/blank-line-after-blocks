@@ -78,7 +78,11 @@ class TestEndToEnd:
 
         try:
             # Run the formatter on the temporary file
-            exit_code = main_func([temp_filename])
+            try:
+                main_func([temp_filename])
+                exit_code = 0  # No SystemExit means success with no changes
+            except SystemExit as e:
+                exit_code = e.code
 
             # Read the formatted content
             with open(temp_filename) as f:
@@ -117,7 +121,11 @@ class TestEndToEnd:
                 shutil.copy2(before_file, temp_file_path)
 
             # Run formatter on the directory
-            exit_code = main_py([temp_dir])
+            try:
+                main_py([temp_dir])
+                exit_code = 0
+            except SystemExit as e:
+                exit_code = e.code
 
             # Check that changes were made (some files should be different)
             assert exit_code == 1, (
@@ -149,7 +157,11 @@ class TestEndToEnd:
                 shutil.copy2(before_file, temp_file_path)
 
             # Run formatter on the directory
-            exit_code = main_jupyter([temp_dir])
+            try:
+                main_jupyter([temp_dir])
+                exit_code = 0
+            except SystemExit as e:
+                exit_code = e.code
 
             # Check that changes were made (some files should be different)
             assert exit_code == 1, (
@@ -186,7 +198,12 @@ class TestEndToEnd:
                 temp_filename = temp_file.name
 
             try:
-                exit_code = main_py([temp_filename])
+                try:
+                    main_py([temp_filename])
+                    exit_code = 0
+                except SystemExit as e:
+                    exit_code = e.code
+
                 assert exit_code == 0, f'Expected no changes for {filename}'
 
                 # Verify content is unchanged
@@ -219,7 +236,12 @@ class TestEndToEnd:
                 temp_filename = temp_file.name
 
             try:
-                exit_code = main_py([temp_filename])
+                try:
+                    main_py([temp_filename])
+                    exit_code = 0
+                except SystemExit as e:
+                    exit_code = e.code
+
                 assert exit_code == 1, f'Expected changes for {filename}'
 
                 # Verify content actually changed
@@ -234,7 +256,7 @@ class TestEndToEnd:
                 os.unlink(temp_filename)
 
     def test_exit_zero_flag(self, test_data_dir):
-        """Test the --exit-zero-even-if-changed flag."""
+        """Test that there is no --exit-zero-even-if-changed flag anymore."""
         before_file = test_data_dir / 'before' / 'basic_if.py'
 
         with tempfile.NamedTemporaryFile(
@@ -244,19 +266,9 @@ class TestEndToEnd:
             temp_filename = temp_file.name
 
         try:
-            # Run with --exit-zero-even-if-changed flag
-            exit_code = main_py([temp_filename, '--exit-zero-even-if-changed'])
-            assert exit_code == 0, (
-                'Expected exit code 0 with --exit-zero-even-if-changed flag'
-            )
-
-            # Verify changes were still made
-            with open(temp_filename) as f:
-                content = f.read()
-
-            assert content != before_file.read_text(), (
-                'Changes should still be made with exit-zero flag'
-            )
+            # Run with non-existent flag should raise SystemExit
+            with pytest.raises(SystemExit):
+                main_py([temp_filename, '--exit-zero-even-if-changed'])
 
         finally:
             os.unlink(temp_filename)
@@ -277,7 +289,12 @@ class TestEndToEnd:
                     temp_files.append(temp_file.name)
 
             # Process all files at once
-            exit_code = main_py(temp_files)
+            try:
+                main_py(temp_files)
+                exit_code = 0
+            except SystemExit as e:
+                exit_code = e.code
+
             assert exit_code == 1, (
                 'Expected changes when processing multiple files'
             )

@@ -17,8 +17,14 @@ pip install blank-line-after-blocks
 # Format Python files
 blank-line-after-blocks file1.py file2.py
 
+# Format with exclude patterns (regex - use | for multiple patterns)
+blank-line-after-blocks --exclude "tests/|_generated\.py$" src/
+
 # Format Jupyter notebooks
 blank-line-after-blocks-jupyter notebook1.ipynb notebook2.ipynb
+
+# Format notebooks with exclude patterns (regex)
+blank-line-after-blocks-jupyter --exclude "notebooks/generated/" notebooks/
 ```
 
 ### Pre-commit Hook
@@ -28,11 +34,41 @@ Add this to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/jsh9/blank-line-after-blocks
-    rev: 0.1.0
+    rev: <LATEST_TAG>
     hooks:
       - id: blank-line-after-blocks
       - id: blank-line-after-blocks-jupyter
 ```
+
+#### Pre-commit with exclude patterns
+
+```yaml
+repos:
+  - repo: https://github.com/jsh9/blank-line-after-blocks
+    rev: <LATEST_TAG>
+    hooks:
+      - id: blank-line-after-blocks
+        args: ["--exclude", "tests/|_generated\.py$"]
+      - id: blank-line-after-blocks-jupyter
+        args: ["--exclude", "notebooks/generated/"]
+```
+
+### Configuration File
+
+You can also configure exclude patterns in `pyproject.toml`:
+
+```toml
+[tool.blank-line-after-blocks]
+exclude = [
+    "tests/",            # Exclude all files in tests directory
+    "_generated\.py$",   # Exclude files ending with _generated.py
+    "vendor/",           # Exclude all files in vendor directory
+    "build/",            # Exclude build directory
+]
+```
+
+**Note**: CLI `--exclude` options take precedence over configuration file
+settings.
 
 ## What it does
 

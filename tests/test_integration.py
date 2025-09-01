@@ -146,7 +146,12 @@ if __name__ == "__main__":
 
         try:
             # Run the formatter on the file
-            exit_code = main_py([temp_filename])
+            try:
+                main_py([temp_filename])
+                exit_code = 0
+            except SystemExit as e:
+                exit_code = e.code
+
             assert exit_code == 1  # Changes were made
 
             # Verify the file was modified correctly
@@ -178,7 +183,12 @@ print(result)
 
         try:
             # Run the formatter
-            exit_code = main_py([temp_filename])
+            try:
+                main_py([temp_filename])
+                exit_code = 0
+            except SystemExit as e:
+                exit_code = e.code
+
             assert exit_code == 0  # No changes were made
 
             # Verify the file was not modified
@@ -215,7 +225,12 @@ print(result)
                     f.write(content)
 
             # Process the directory
-            exit_code = main_py([temp_dir])
+            try:
+                main_py([temp_dir])
+                exit_code = 0
+            except SystemExit as e:
+                exit_code = e.code
+
             assert exit_code == 1  # Changes were made
 
             # Verify results
@@ -249,7 +264,12 @@ print(result)
 
         try:
             # Should not crash, should return 0 (no changes made)
-            exit_code = main_py([temp_filename])
+            try:
+                main_py([temp_filename])
+                exit_code = 0
+            except SystemExit as e:
+                exit_code = e.code
+
             assert exit_code == 0
 
             # File should be unchanged

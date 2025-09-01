@@ -1,8 +1,8 @@
-import argparse
 import json
 import sys
-from collections.abc import Sequence
+from pathlib import Path
 
+import click
 from jupyter_notebook_parser import JupyterNotebookParser
 from jupyter_notebook_parser import JupyterNotebookRewriter
 from jupyter_notebook_parser import SourceCodeContainer
@@ -15,8 +15,8 @@ from blank_line_after_blocks.base_fixer import BaseFixer
 class JupyterNotebookFixer(BaseFixer):
     """Fixer for Jupyter notebook files."""
 
-    def __init__(self, path: str, cli_args: argparse.Namespace) -> None:
-        super().__init__(path=path, cli_args=cli_args)
+    def __init__(self, path: str, exclude_pattern: str = '') -> None:
+        super().__init__(path=path, exclude_pattern=exclude_pattern)
 
     def fix_one_directory_or_one_file(self) -> int:
         """Fix formatting in a single file or all Jupyter notebook files in a directory."""
@@ -28,7 +28,7 @@ class JupyterNotebookFixer(BaseFixer):
             return self.fix_one_file(path_obj.as_posix())
 
         # Process .ipynb files instead of .py files for Jupyter notebooks
-        filenames = sorted(path_obj.rglob('*.ipynb'))
+        filenames = self._get_files_to_process(path_obj, '*.ipynb')
         all_status = set()
         for filename in filenames:
             status = self.fix_one_file(str(filename))
@@ -38,6 +38,12 @@ class JupyterNotebookFixer(BaseFixer):
 
     def fix_one_file(self, filename: str) -> int:
         """Fix formatting in a single Jupyter notebook file."""
+        file_path = Path(filename)
+        if not file_path.is_file():
+            msg = f'{filename} is not a file (skipping)'
+            print(msg, file=sys.stderr)
+            return 0
+
         try:
             parsed = JupyterNotebookParser(filename)
             rewriter = JupyterNotebookRewriter(parsed_notebook=parsed)
@@ -75,22 +81,26 @@ class JupyterNotebookFixer(BaseFixer):
                     # but json.dump does not.
                     fp.write('\n')
 
-            return 0 if self.cli_args.exit_zero_even_if_changed else ret_val
+            return ret_val
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    """Format Jupyter notebooks by adding blank lines after blocks."""
-    parser = argparse.ArgumentParser()
-    parser.add_argument('paths', nargs='*')
-    parser.add_argument('--exit-zero-even-if-changed', action='store_true')
-    args = parser.parse_args(argv)
-
+@click.command()
+@click.argument('paths', nargs=-1, type=click.Path())
+@click.option(
+    '--exclude',
+    type=str,
+    default='',
+    help='Regex pattern to exclude files/directories',
+)
+def main(paths: tuple[str, ...], exclude: str) -> None:
+    """Add blank lines after if/for/while/with/try blocks in Jupyter notebooks."""
     ret = 0
-    for path in args.paths:
-        fixer = JupyterNotebookFixer(path=path, cli_args=args)
+    for path in paths:
+        fixer = JupyterNotebookFixer(path=path, exclude_pattern=exclude)
         ret |= fixer.fix_one_directory_or_one_file()
 
-    return ret
+    if ret != 0:
+        raise SystemExit(ret)
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "blank-line-after-blocks"
-version = "0.1.1"
+version = "0.1.2"
 description = "A Python formatter to automatically add blank lines after if/for/while/with/try blocks"
 readme = "README.md"
 license = {text = "MIT"}
@@ -37,6 +37,7 @@ keywords = ["formatter", "code-style", "blank-lines", "python"]
 requires-python = ">=3.10"
 dependencies = [
     "jupyter-notebook-parser>=0.1.4",
+    "click>=8.0",
 ]
 
 [project.optional-dependencies]

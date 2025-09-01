@@ -17,14 +17,14 @@ pip install blank-line-after-blocks
 # Format Python files
 blank-line-after-blocks file1.py file2.py
 
-# Format with exclude patterns
-blank-line-after-blocks --exclude "tests/*" --exclude "*_generated.py" src/
+# Format with exclude patterns (regex - use | for multiple patterns)
+blank-line-after-blocks --exclude "tests/|_generated\.py$" src/
 
 # Format Jupyter notebooks
 blank-line-after-blocks-jupyter notebook1.ipynb notebook2.ipynb
 
-# Format notebooks with exclude patterns
-blank-line-after-blocks-jupyter --exclude "notebooks/generated/*" notebooks/
+# Format notebooks with exclude patterns (regex)
+blank-line-after-blocks-jupyter --exclude "notebooks/generated/" notebooks/
 ```
 
 ### Pre-commit Hook
@@ -48,9 +48,9 @@ repos:
     rev: <LATEST_TAG>
     hooks:
       - id: blank-line-after-blocks
-        args: ["--exclude", "tests/*", "--exclude", "*_generated.py"]
+        args: ["--exclude", "tests/|_generated\.py$"]
       - id: blank-line-after-blocks-jupyter
-        args: ["--exclude", "notebooks/generated/*"]
+        args: ["--exclude", "notebooks/generated/"]
 ```
 
 ### Configuration File
@@ -60,10 +60,10 @@ You can also configure exclude patterns in `pyproject.toml`:
 ```toml
 [tool.blank-line-after-blocks]
 exclude = [
-    "tests/*",           # Exclude all files in tests directory
-    "*_generated.py",    # Exclude files ending with _generated.py
-    "vendor/*",          # Exclude all files in vendor directory
-    "build/*",           # Exclude build directory
+    "tests/",            # Exclude all files in tests directory
+    "_generated\.py$",   # Exclude files ending with _generated.py
+    "vendor/",           # Exclude all files in vendor directory
+    "build/",            # Exclude build directory
 ]
 ```
 

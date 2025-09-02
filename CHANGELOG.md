@@ -6,6 +6,16 @@ The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2025-09-02
+
+- Fixed
+  - Exclude functionality now works correctly for single files in pre-commit
+    hooks
+- Added
+  - Tests for single file exclusion scenarios
+- Full diff
+  - https://github.com/jsh9/blank-line-after-blocks/compare/0.1.2...0.1.3
+
 ## [0.1.2] - 2025-09-01
 
 - Added
@@ -13,7 +23,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Removed
   - An unnecessary config option `--exit-zero-even-if-changed`
 - Full diff
-  - https://github.com/jsh9/blank-line-after-blocks/compare/v0.1.1...v0.1.2
+  - https://github.com/jsh9/blank-line-after-blocks/compare/0.1.1...0.1.2
 
 ## [0.1.1] - 2025-08-27
 
@@ -22,7 +32,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Fixed
   - File path for Windows
 - Full diff
-  - https://github.com/jsh9/blank-line-after-blocks/compare/v0.1.0...v0.1.1
+  - https://github.com/jsh9/blank-line-after-blocks/compare/0.1.0...0.1.1
 
 ## [0.1.0] - 2025-08-27
 
@@ -37,3 +47,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - Comprehensive test suite with test data for various scenarios
   - Configuration support via pyproject.toml and tox.ini
   - Development dependencies and tooling setup
+- Full diff
+  - N/A

@@ -19,7 +19,7 @@ def parseChangelog(filePath: str) -> tuple[bool, list[str]]:
     list[str]
         A list of version headers missing the "Full diff" section.
     """
-    with open(filePath, 'r', encoding='utf-8') as file:
+    with open(filePath, encoding='utf-8') as file:
         content = file.read()
 
     # Parse the Markdown content

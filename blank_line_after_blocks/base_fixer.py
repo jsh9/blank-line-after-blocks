@@ -23,13 +23,11 @@ class BaseFixer:
     ) -> list[Path]:
         """Get list of files to process, filtered by exclude pattern."""
         all_files = sorted(directory.rglob(pattern))
-        filtered_files = [
+        return [
             f
             for f in all_files
             if not should_exclude_file(f, self.exclude_pattern)
         ]
-
-        return filtered_files
 
     def fix_one_directory_or_one_file(self) -> int:
         """Fix formatting in a single file or all Python files in a directory."""
@@ -38,6 +36,7 @@ class BaseFixer:
         if path_obj.is_file():
             if should_exclude_file(path_obj, self.exclude_pattern):
                 return 0
+
             return self.fix_one_file(path_obj.as_posix())
 
         # Is a directory

@@ -9,7 +9,11 @@ from blank_line_after_blocks.config import should_exclude_file
 class BaseFixer:
     """Base class for fixing code formatting issues."""
 
-    def __init__(self, path: str, exclude_pattern: str = '') -> None:
+    def __init__(
+            self,
+            path: str,
+            exclude_pattern: str = r'\.git|\.tox|\.pytest_cache',
+    ) -> None:
         """Initialize the fixer with a path and optional exclude pattern."""
         self.path = path
         self.exclude_pattern = exclude_pattern

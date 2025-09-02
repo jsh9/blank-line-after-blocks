@@ -10,8 +10,8 @@ def should_exclude_file(file_path: Path, exclude_pattern: str) -> bool:
         return False
 
     try:
-        pattern = re.compile(exclude_pattern)
-        return bool(pattern.search(file_path.as_posix()))
+        exclude_regex = re.compile(exclude_pattern)
+        return bool(exclude_regex.search(file_path.as_posix()))
     except re.error:
         # Invalid regex pattern, don't exclude anything
         return False

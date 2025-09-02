@@ -15,7 +15,11 @@ from blank_line_after_blocks.base_fixer import BaseFixer
 class JupyterNotebookFixer(BaseFixer):
     """Fixer for Jupyter notebook files."""
 
-    def __init__(self, path: str, exclude_pattern: str = '') -> None:
+    def __init__(
+            self,
+            path: str,
+            exclude_pattern: str = r'\.git|\.tox|\.pytest_cache',
+    ) -> None:
         super().__init__(path=path, exclude_pattern=exclude_pattern)
 
     def fix_one_directory_or_one_file(self) -> int:
@@ -89,7 +93,7 @@ class JupyterNotebookFixer(BaseFixer):
 @click.option(
     '--exclude',
     type=str,
-    default='',
+    default=r'\.git|\.tox|\.pytest_cache',
     help='Regex pattern to exclude files/directories',
 )
 def main(paths: tuple[str, ...], exclude: str) -> None:

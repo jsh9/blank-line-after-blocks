@@ -247,3 +247,54 @@ class TestBaseFixer:
             assert result == 0
             # Both files should be processed since exclude is empty
             assert len(fixer.processed_files) == 2
+
+    def test_exclude_single_file(self):
+        """Test that single files can be excluded."""
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.py', delete=False
+        ) as f:
+            f.write('# test content')
+            temp_filename = f.name
+
+        try:
+            # Create pattern that matches the temp filename
+            exclude_pattern = Path(temp_filename).name
+            fixer = ConcreteFixer(
+                path=temp_filename,
+                return_value=0,
+                exclude_pattern=exclude_pattern,
+            )
+            result = fixer.fix_one_directory_or_one_file()
+
+            # File should be excluded, so return 0 and no files processed
+            assert result == 0
+            assert len(fixer.processed_files) == 0
+
+        finally:
+            os.unlink(temp_filename)
+
+    def test_exclude_single_file_not_matching_pattern(self):
+        """Test that single files not matching pattern are processed."""
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.py', delete=False
+        ) as f:
+            f.write('# test content')
+            temp_filename = f.name
+
+        try:
+            # Create pattern that does NOT match the temp filename
+            exclude_pattern = r'nonexistent_pattern'
+            fixer = ConcreteFixer(
+                path=temp_filename,
+                return_value=0,
+                exclude_pattern=exclude_pattern,
+            )
+            result = fixer.fix_one_directory_or_one_file()
+
+            # File should not be excluded, so it gets processed
+            assert result == 0
+            assert len(fixer.processed_files) == 1
+            assert Path(fixer.processed_files[0]) == Path(temp_filename)
+
+        finally:
+            os.unlink(temp_filename)

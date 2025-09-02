@@ -37,6 +37,7 @@ class BaseFixer:
     def fix_one_directory_or_one_file(self) -> int:
         """Fix formatting in a single file or all Python files in a directory."""
         path_obj = Path(self.path)
+        print(f'[DEBUG] Processing path: {path_obj}')
 
         if path_obj.is_file():
             return self.fix_one_file(path_obj.as_posix())

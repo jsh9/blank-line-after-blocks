@@ -63,13 +63,8 @@ class PythonFileFixer(BaseFixer):
 )
 def main(paths: tuple[str, ...], exclude: str) -> None:
     """Add blank lines after if/for/while/with/try blocks in Python files."""
-    print(f'[DEBUG] main_py called with:')
-    print(f'[DEBUG]   paths: {paths}')
-    print(f"[DEBUG]   exclude: '{exclude}'")
-
     ret = 0
     for path in paths:
-        print(f'[DEBUG] Processing path: {path}')
         fixer = PythonFileFixer(path=path, exclude_pattern=exclude)
         ret |= fixer.fix_one_directory_or_one_file()
 

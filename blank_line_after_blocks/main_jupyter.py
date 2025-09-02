@@ -98,13 +98,8 @@ class JupyterNotebookFixer(BaseFixer):
 )
 def main(paths: tuple[str, ...], exclude: str) -> None:
     """Add blank lines after if/for/while/with/try blocks in Jupyter notebooks."""
-    print(f'[DEBUG] main_jupyter called with:')
-    print(f'[DEBUG]   paths: {paths}')
-    print(f"[DEBUG]   exclude: '{exclude}'")
-
     ret = 0
     for path in paths:
-        print(f'[DEBUG] Processing path: {path}')
         fixer = JupyterNotebookFixer(path=path, exclude_pattern=exclude)
         ret |= fixer.fix_one_directory_or_one_file()
 

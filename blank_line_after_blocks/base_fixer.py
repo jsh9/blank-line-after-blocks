@@ -26,23 +26,11 @@ class BaseFixer:
             self, directory: Path, pattern: str
     ) -> list[Path]:
         """Get list of files to process, filtered by exclude pattern."""
-        print(f'[DEBUG] Scanning directory: {directory.as_posix()}')
-        print(f'[DEBUG] File pattern: {pattern}')
-        print(f"[DEBUG] Exclude pattern: '{self.exclude_pattern}'")
-
         all_files = sorted(directory.rglob(pattern))
-        print(
-            f"[DEBUG] Found {len(all_files)} files matching pattern '{pattern}':"
-        )
-        for f in all_files:
-            print(f'[DEBUG]   - {f.as_posix()}')
-
         filtered_files = [f for f in all_files if not self._should_exclude(f)]
-        print(
-            f'[DEBUG] After exclusion filtering: {len(filtered_files)} files remaining'
-        )
-        for f in filtered_files:
-            print(f'[DEBUG]   + {f.as_posix()}')
+
+        print(f'[DEBUG] Found {len(all_files)} files (before filtering)')
+        print(f'[DEBUG] After filtering: {len(filtered_files)} files')
 
         return filtered_files
 

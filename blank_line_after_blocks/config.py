@@ -11,11 +11,7 @@ def should_exclude_file(file_path: Path, exclude_pattern: str) -> bool:
 
     try:
         exclude_regex = re.compile(exclude_pattern)
-        matches = bool(exclude_regex.search(file_path.as_posix()))
-        if matches:
-            print(f'[DEBUG] EXCLUDED: {file_path.as_posix()}')
-        return matches
-    except re.error as e:
+        return bool(exclude_regex.search(file_path.as_posix()))
+    except re.error:
         # Invalid regex pattern, don't exclude anything
-        print(f"[DEBUG] Invalid regex pattern '{exclude_pattern}': {e}")
         return False

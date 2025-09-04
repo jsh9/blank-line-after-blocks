@@ -9,6 +9,15 @@ def process_data(data):
     print('No data to process')
     return None
 
+def process_data_with_comment(data):
+    if data:
+        print('Processing data')
+        result = data * 2
+        return result
+        # Already a comment; no new line is added
+    print('No data to process')
+    return None
+
 def main():
     items = [1, 2, 3, 4, 5]
     for item in items:

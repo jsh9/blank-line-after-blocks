@@ -1,5 +1,7 @@
 from __future__ import annotations
 import ast
+import re
+from pathlib import Path
 
 
 def fix_src(source_code: str) -> str:
@@ -67,7 +69,27 @@ def _add_blank_lines(lines: list[str], blocks_to_fix: set[int]) -> str:
             # Check if next line exists and is not already blank
             if i + 1 < len(lines):
                 next_line = lines[i + 1].strip()
-                if next_line and not next_line.startswith(('#', '"""', "'''")):
+                # Do not insert a blank line before the second part of a
+                # compound block, such as else/elif/except/finally clauses.
+                compound_headers = ('else:', 'elif ', 'except', 'finally:')
+                if (
+                    next_line
+                    and not next_line.startswith(('#', '"""', "'''"))
+                    and not next_line.startswith(compound_headers)
+                ):
                     result.append('\n')
 
     return ''.join(result)
+
+
+def should_exclude_file(file_path: Path, exclude_pattern: str) -> bool:
+    """Check if a file should be excluded based on the regex pattern."""
+    if not exclude_pattern:
+        return False
+
+    try:
+        exclude_regex = re.compile(exclude_pattern)
+        return bool(exclude_regex.search(file_path.as_posix()))
+    except re.error:
+        # Invalid regex pattern, don't exclude anything
+        return False

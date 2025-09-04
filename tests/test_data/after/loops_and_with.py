@@ -24,7 +24,6 @@ def count_items(items, threshold=10):
                 print(f'Found item {item} > {count}')
                 count += 1
                 break
-
         else:
             print('No more items found')
             break

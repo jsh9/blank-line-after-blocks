@@ -64,13 +64,13 @@ class TestIntegration:
             # While loop with else
             (
                 'while condition:\n    do_work()\nelse:\n    no_break_occurred()\nafter_while()',
-                'while condition:\n    do_work()\n\nelse:\n    no_break_occurred()\n\nafter_while()',
+                'while condition:\n    do_work()\nelse:\n    no_break_occurred()\n\nafter_while()',
                 'While loop with else clause',
             ),
             # For loop with else
             (
                 'for item in items:\n    if process(item):\n        break\nelse:\n    all_processed()\nafter_for()',
-                'for item in items:\n    if process(item):\n        break\n\nelse:\n    all_processed()\n\nafter_for()',
+                'for item in items:\n    if process(item):\n        break\nelse:\n    all_processed()\n\nafter_for()',
                 'For loop with else clause',
             ),
         ],

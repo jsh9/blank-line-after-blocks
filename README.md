@@ -97,6 +97,11 @@ and subsequent code.
       process(item)
 +
   final_step()
+
+  if a > 3:
+      print('a > 3')
+      # Already a comment; no new line added
+  a += 2
 ```
 
 ### Try/except blocks with context managers
@@ -134,4 +139,17 @@ and subsequent code.
               self.handle_error(e)
 +
           print('method complete')
+```
+
+### Compound blocks stay tight (no blank line before else/elif/except/finally)
+
+If a block ends right before the second part of compound blocks (if/else,
+try/except, etc.), no blank line is added:
+
+```python
+for item in items:
+    if found(item):
+        break
+else:
+    not_found()
 ```

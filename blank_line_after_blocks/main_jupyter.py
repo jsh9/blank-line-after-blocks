@@ -9,6 +9,7 @@ from jupyter_notebook_parser import SourceCodeContainer
 from jupyter_notebook_parser import reconstruct_source
 
 import blank_line_after_blocks.helper as helper
+from blank_line_after_blocks import __version__
 from blank_line_after_blocks.base_fixer import BaseFixer
 
 
@@ -89,6 +90,7 @@ class JupyterNotebookFixer(BaseFixer):
 
 
 @click.command()
+@click.version_option(version=__version__)
 @click.argument('paths', nargs=-1, type=click.Path())
 @click.option(
     '--exclude',

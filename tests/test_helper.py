@@ -149,7 +149,7 @@ def test_blocks_at_end_of_file():
         # Test for-else
         (
             'for item in items:\n    if found(item):\n        break\nelse:\n    not_found()\nafter_for()',
-            'for item in items:\n    if found(item):\n        break\n\nelse:\n    not_found()\n\nafter_for()',
+            'for item in items:\n    if found(item):\n        break\nelse:\n    not_found()\n\nafter_for()',
         ),
     ],
 )

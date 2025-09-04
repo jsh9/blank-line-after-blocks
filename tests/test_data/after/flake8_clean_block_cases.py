@@ -89,7 +89,6 @@ def complex_func():
         while z > 0:
             print(z)
             z -= 1
-
     elif y == 2:
         print(y)
         for k in range(10):
@@ -98,7 +97,6 @@ def complex_func():
                 l += 2
 
             bb = 1
-
     else:
         raise ValueError
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 from pathlib import Path
 
-from blank_line_after_blocks.config import should_exclude_file
+from blank_line_after_blocks.helper import should_exclude_file
 
 
 class BaseFixer:

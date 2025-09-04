@@ -6,6 +6,18 @@ The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2025-09-03
+
+- Changed
+  - Formatter no longer inserts a blank line before the second part of compound
+    blocks (`else/elif/except/finally`). This avoids awkward spacing like a
+    blank line before `else:` and keeps compound statements visually tight.
+- Added
+  - `--version` flag for both CLIs (`blank-line-after-blocks` and
+    `blank-line-after-blocks-jupyter`) to print the tool version.
+- Full diff
+  - https://github.com/jsh9/blank-line-after-blocks/compare/0.1.3...0.1.4
+
 ## [0.1.3] - 2025-09-02
 
 - Fixed

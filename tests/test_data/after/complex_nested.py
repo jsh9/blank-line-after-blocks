@@ -17,14 +17,12 @@ class DataProcessor:
                         self.processed.append(processed_item)
                     else:
                         print('Missing required field')
-
                 except FileNotFoundError:
                     print(f"File not found: {item.get('file_path', 'unknown')}")
                 except Exception as e:
                     print(f'Error processing item: {e}')
                 finally:
                     item['processed'] = True
-
             else:
                 if item is not None:
                     self.processed.append(str(item))

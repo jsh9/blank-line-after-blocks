@@ -31,7 +31,7 @@ class TestEndToEnd:
 
     @pytest.fixture
     def get_expected_content(self, test_data_dir):
-        """Helper function to get expected content for a file."""
+        """Get expected content for a file."""
 
         def _get_expected(filename):
             after_file = test_data_dir / 'after' / filename

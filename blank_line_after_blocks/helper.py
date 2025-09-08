@@ -32,7 +32,7 @@ def _collect_blocks_to_fix(tree: ast.Module) -> set[int]:
         if isinstance(node, block_types):
             # Handle compound statements (for-else, while-else) specially
             if (
-                isinstance(node, (ast.For, ast.While))
+                isinstance(node, ast.For | ast.While)
                 and hasattr(node, 'orelse')
                 and node.orelse
             ):

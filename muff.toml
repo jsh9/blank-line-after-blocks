@@ -8,11 +8,13 @@ target-version = "py310"
 [format]
 quote-style = "single"
 docstring-code-format = true
+preview = true
 
 [lint]
 extend-select = [
     "F",
     "E",
+    "I",   # isort
     "UP",  # pyupgrade
     "D",   # pydocstyle
     "B",   # flake8-bugbear
@@ -25,11 +27,11 @@ extend-select = [
     "W505",
 ]
 ignore = [
-    "E501",
     "D100",
     "D104",
     "D105",
     "D107",
+    "D200",
     "D205",
     "D400",
 ]
@@ -37,3 +39,9 @@ ignore = [
 [lint.flake8-quotes]
 docstring-quotes = "double"
 inline-quotes = "single"
+
+[lint.pydocstyle]
+convention = "numpy"
+
+[lint.per-file-ignores]
+"tests/*" = ["D102"]  # No need for docstrings in tests

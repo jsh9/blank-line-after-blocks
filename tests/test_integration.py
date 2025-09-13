@@ -1,10 +1,12 @@
 """Integration tests for blank-line-after-blocks formatter."""
 
-import pytest
-import tempfile
 import os
-from blank_line_after_blocks.main_py import main as main_py
+import tempfile
+
+import pytest
+
 from blank_line_after_blocks.helper import fix_src
+from blank_line_after_blocks.main_py import main as main_py
 
 
 class TestIntegration:
@@ -21,20 +23,45 @@ class TestIntegration:
             ),
             # Multiple nested blocks
             (
-                'def function():\n    if condition:\n        for item in items:\n            process(item)\n        done_processing()\n    final_step()',
-                'def function():\n    if condition:\n        for item in items:\n            process(item)\n\n        done_processing()\n\n    final_step()',
+                (
+                    'def function():\n    if condition:\n        for item in '
+                    'items:\n            process(item)\n        '
+                    'done_processing()\n'
+                    '    final_step()'
+                ),
+                (
+                    'def function():\n    if condition:\n        for item in '
+                    'items:\n            process(item)\n\n        '
+                    'done_processing()\n\n    final_step()'
+                ),
                 'Nested blocks within function',
             ),
             # Complex control flow
             (
-                'try:\n    risky_operation()\nexcept ValueError as e:\n    handle_value_error(e)\nexcept Exception as e:\n    handle_general_error(e)\nfinally:\n    cleanup()\nfinal_step()',
-                'try:\n    risky_operation()\nexcept ValueError as e:\n    handle_value_error(e)\nexcept Exception as e:\n    handle_general_error(e)\nfinally:\n    cleanup()\n\nfinal_step()',
+                (
+                    'try:\n    risky_operation()\nexcept ValueError as e:\n'
+                    '    handle_value_error(e)\nexcept Exception as e:\n'
+                    '    handle_general_error(e)\nfinally:\n    cleanup()\n'
+                    'final_step()'
+                ),
+                (
+                    'try:\n    risky_operation()\nexcept ValueError as e:\n'
+                    '    handle_value_error(e)\nexcept Exception as e:\n'
+                    '    handle_general_error(e)\nfinally:\n    cleanup()\n\n'
+                    'final_step()'
+                ),
                 'Try-except-finally block',
             ),
             # With statement
             (
-                "with open('file.txt') as f:\n    content = f.read()\nprocess_content(content)",
-                "with open('file.txt') as f:\n    content = f.read()\n\nprocess_content(content)",
+                (
+                    "with open('file.txt') as f:\n    content = f.read()\n"
+                    'process_content(content)'
+                ),
+                (
+                    "with open('file.txt') as f:\n    content = f.read()\n\n"
+                    'process_content(content)'
+                ),
                 'With statement',
             ),
             # Already formatted code (no changes needed)
@@ -57,20 +84,38 @@ class TestIntegration:
             ),
             # Class definitions (should not add blank lines after class)
             (
-                'class MyClass:\n    def method(self):\n        pass\nother_code()',
-                'class MyClass:\n    def method(self):\n        pass\nother_code()',
+                (
+                    'class MyClass:\n    def method(self):\n        pass\n'
+                    'other_code()'
+                ),
+                (
+                    'class MyClass:\n    def method(self):\n        pass\n'
+                    'other_code()'
+                ),
                 'Class definition',
             ),
             # While loop with else
             (
-                'while condition:\n    do_work()\nelse:\n    no_break_occurred()\nafter_while()',
-                'while condition:\n    do_work()\nelse:\n    no_break_occurred()\n\nafter_while()',
+                (
+                    'while condition:\n    do_work()\nelse:\n'
+                    '    no_break_occurred()\nafter_while()'
+                ),
+                (
+                    'while condition:\n    do_work()\nelse:\n'
+                    '    no_break_occurred()\n\nafter_while()'
+                ),
                 'While loop with else clause',
             ),
             # For loop with else
             (
-                'for item in items:\n    if process(item):\n        break\nelse:\n    all_processed()\nafter_for()',
-                'for item in items:\n    if process(item):\n        break\nelse:\n    all_processed()\n\nafter_for()',
+                (
+                    'for item in items:\n    if process(item):\n'
+                    '        break\nelse:\n    all_processed()\nafter_for()'
+                ),
+                (
+                    'for item in items:\n    if process(item):\n'
+                    '        break\nelse:\n    all_processed()\n\nafter_for()'
+                ),
                 'For loop with else clause',
             ),
         ],
@@ -207,14 +252,18 @@ print(result)
             # Create test files
             files_data = {
                 'file1.py': "if True:\n    print('file1')\nprint('done')",
-                'file2.py': "for i in range(3):\n    print(i)\nprint('finished')",
+                'file2.py': (  # noqa: PAR001
+                    "for i in range(3):\n    print(i)\nprint('finished')"
+                ),
                 'file3.py': "# No blocks\nprint('simple')",
                 'not_python.txt': 'This should be ignored',
             }
 
             expected_results = {
                 'file1.py': "if True:\n    print('file1')\n\nprint('done')",
-                'file2.py': "for i in range(3):\n    print(i)\n\nprint('finished')",
+                'file2.py': (  # noqa: PAR001
+                    "for i in range(3):\n    print(i)\n\nprint('finished')"
+                ),
                 'file3.py': "# No blocks\nprint('simple')",
             }
 

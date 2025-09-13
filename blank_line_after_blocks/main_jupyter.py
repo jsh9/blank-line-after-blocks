@@ -3,10 +3,12 @@ import sys
 from pathlib import Path
 
 import click
-from jupyter_notebook_parser import JupyterNotebookParser
-from jupyter_notebook_parser import JupyterNotebookRewriter
-from jupyter_notebook_parser import SourceCodeContainer
-from jupyter_notebook_parser import reconstruct_source
+from jupyter_notebook_parser import (
+    JupyterNotebookParser,
+    JupyterNotebookRewriter,
+    SourceCodeContainer,
+    reconstruct_source,
+)
 
 import blank_line_after_blocks.helper as helper
 from blank_line_after_blocks import __version__
@@ -24,7 +26,9 @@ class JupyterNotebookFixer(BaseFixer):
         super().__init__(path=path, exclude_pattern=exclude_pattern)
 
     def fix_one_directory_or_one_file(self) -> int:
-        """Fix formatting in a single file or all Jupyter notebook files in a directory."""
+        """Fix formatting in a single file or all Jupyter notebook files
+        in a directory.
+        """
         from pathlib import Path
 
         path_obj = Path(self.path)
@@ -99,7 +103,9 @@ class JupyterNotebookFixer(BaseFixer):
     help='Regex pattern to exclude files/directories',
 )
 def main(paths: tuple[str, ...], exclude: str) -> None:
-    """Add blank lines after if/for/while/with/try blocks in Jupyter notebooks."""
+    """Add blank lines after if/for/while/with/try blocks in Jupyter
+    notebooks.
+    """
     ret = 0
     for path in paths:
         fixer = JupyterNotebookFixer(path=path, exclude_pattern=exclude)

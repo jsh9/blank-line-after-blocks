@@ -1,9 +1,11 @@
 """Tests for main_py.py module."""
 
-import pytest
-import tempfile
 import os
+import tempfile
 from unittest.mock import patch
+
+import pytest
+
 from blank_line_after_blocks.main_py import PythonFileFixer, main
 
 
@@ -155,7 +157,9 @@ class TestMainFunction:
             assert exc_info.value.code == 1
 
     def test_main_multiple_files_mixed_results(self):
-        """Test main with multiple files where some have changes and some don't."""
+        """
+        Test main with multiple files where some have changes and some don't.
+        """
         with patch(
             'blank_line_after_blocks.main_py.PythonFileFixer'
         ) as MockFixer:

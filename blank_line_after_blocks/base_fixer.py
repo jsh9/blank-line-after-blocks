@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
 from pathlib import Path
+from typing import Any
 
 from blank_line_after_blocks.helper import should_exclude_file
 
@@ -30,7 +30,9 @@ class BaseFixer:
         ]
 
     def fix_one_directory_or_one_file(self) -> int:
-        """Fix formatting in a single file or all Python files in a directory."""
+        """
+        Fix formatting in a single file or all Python files in a directory.
+        """
         path_obj = Path(self.path)
 
         if path_obj.is_file():

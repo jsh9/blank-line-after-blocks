@@ -1,10 +1,12 @@
 """Tests for main_jupyter.py module."""
 
-import pytest
-import tempfile
 import json
 import os
-from unittest.mock import patch, MagicMock
+import tempfile
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from blank_line_after_blocks.main_jupyter import JupyterNotebookFixer, main
 
 
@@ -83,7 +85,9 @@ class TestJupyterNotebookFixer:
         try:
             with patch(
                 'blank_line_after_blocks.main_jupyter.reconstruct_source',
-                return_value='if condition:\n    do_something()\n\nnext_line()',
+                return_value=(
+                    'if condition:\\n    do_something()\\n\\nnext_line()'
+                ),
             ):
                 with patch('builtins.open', create=True):
                     with patch('json.dump'):
@@ -103,8 +107,8 @@ class TestJupyterNotebookFixer:
     @patch('blank_line_after_blocks.main_jupyter.JupyterNotebookParser')
     def test_fix_one_file_parse_error(self, mock_parser_class, fixer):
         """Test fix_one_file when notebook parsing fails."""
-        import tempfile
         import os
+        import tempfile
 
         mock_parser_class.side_effect = Exception('Parse error')
 

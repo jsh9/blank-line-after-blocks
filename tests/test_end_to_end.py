@@ -1,12 +1,14 @@
 """End-to-end tests using real before/after file pairs."""
 
-import pytest
-import tempfile
-import shutil
 import os
+import shutil
+import tempfile
 from pathlib import Path
-from blank_line_after_blocks.main_py import main as main_py
+
+import pytest
+
 from blank_line_after_blocks.main_jupyter import main as main_jupyter
+from blank_line_after_blocks.main_py import main as main_py
 
 
 class TestEndToEnd:

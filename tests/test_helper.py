@@ -1,6 +1,7 @@
 """Tests for helper.py module."""
 
 import pytest
+
 from blank_line_after_blocks.helper import fix_src
 
 
@@ -24,18 +25,36 @@ from blank_line_after_blocks.helper import fix_src
         ),
         # Test with statement
         (
-            "with open('file.txt') as f:\n    content = f.read()\nprocess(content)",
-            "with open('file.txt') as f:\n    content = f.read()\n\nprocess(content)",
+            (
+                "with open('file.txt') as f:\n    content = f.read()\n"
+                'process(content)'
+            ),
+            (
+                "with open('file.txt') as f:\n    content = f.read()\n\n"
+                'process(content)'
+            ),
         ),
         # Test try statement
         (
-            'try:\n    risky_operation()\nexcept Exception:\n    handle_error()\nfinal_step()',
-            'try:\n    risky_operation()\nexcept Exception:\n    handle_error()\n\nfinal_step()',
+            (
+                'try:\n    risky_operation()\nexcept Exception:\n'
+                '    handle_error()\nfinal_step()'
+            ),
+            (
+                'try:\n    risky_operation()\nexcept Exception:\n'
+                '    handle_error()\n\nfinal_step()'
+            ),
         ),
         # Test nested if statements
         (
-            'if outer:\n    if inner:\n        nested_action()\n    inner_done()\nouter_done()',
-            'if outer:\n    if inner:\n        nested_action()\n\n    inner_done()\n\nouter_done()',
+            (
+                'if outer:\n    if inner:\n        nested_action()\n'
+                '    inner_done()\nouter_done()'
+            ),
+            (
+                'if outer:\n    if inner:\n        nested_action()\n\n'
+                '    inner_done()\n\nouter_done()'
+            ),
         ),
         # Test already has blank line - should not add another
         (
@@ -44,8 +63,14 @@ from blank_line_after_blocks.helper import fix_src
         ),
         # Test multiple blocks
         (
-            'if first:\n    do_first()\nif second:\n    do_second()\nfinal()',
-            'if first:\n    do_first()\n\nif second:\n    do_second()\n\nfinal()',
+            (
+                'if first:\n    do_first()\nif second:\n    do_second()\n'
+                'final()'
+            ),
+            (
+                'if first:\n    do_first()\n\nif second:\n    do_second()\n\n'
+                'final()'
+            ),
         ),
     ],
 )
@@ -138,18 +163,38 @@ def test_blocks_at_end_of_file():
     [
         # Test if-elif-else
         (
-            'if condition1:\n    action1()\nelif condition2:\n    action2()\nelse:\n    action3()\nafter_block()',
-            'if condition1:\n    action1()\nelif condition2:\n    action2()\nelse:\n    action3()\n\nafter_block()',
+            (
+                'if condition1:\n    action1()\nelif condition2:\n'
+                '    action2()\nelse:\n    action3()\nafter_block()'
+            ),
+            (
+                'if condition1:\n    action1()\nelif condition2:\n'
+                '    action2()\nelse:\n    action3()\n\nafter_block()'
+            ),
         ),
         # Test try-except-finally
         (
-            'try:\n    risky()\nexcept ValueError:\n    handle_value_error()\nexcept Exception:\n    handle_general()\nfinally:\n    cleanup()\nafter_try()',
-            'try:\n    risky()\nexcept ValueError:\n    handle_value_error()\nexcept Exception:\n    handle_general()\nfinally:\n    cleanup()\n\nafter_try()',
+            (
+                'try:\n    risky()\nexcept ValueError:\n'
+                '    handle_value_error()\nexcept Exception:\n'
+                '    handle_general()\nfinally:\n    cleanup()\nafter_try()'
+            ),
+            (
+                'try:\n    risky()\nexcept ValueError:\n'
+                '    handle_value_error()\nexcept Exception:\n'
+                '    handle_general()\nfinally:\n    cleanup()\n\nafter_try()'
+            ),
         ),
         # Test for-else
         (
-            'for item in items:\n    if found(item):\n        break\nelse:\n    not_found()\nafter_for()',
-            'for item in items:\n    if found(item):\n        break\nelse:\n    not_found()\n\nafter_for()',
+            (
+                'for item in items:\n    if found(item):\n        break\n'
+                'else:\n    not_found()\nafter_for()'
+            ),
+            (
+                'for item in items:\n    if found(item):\n        break\n'
+                'else:\n    not_found()\n\nafter_for()'
+            ),
         ),
     ],
 )
@@ -160,7 +205,9 @@ def test_compound_statements(input_code, expected_output):
 
 
 def test_indented_blocks():
-    """Test that indented blocks within functions/classes are handled correctly."""
+    """
+    Test that indented blocks within functions/classes are handled correctly.
+    """
     input_code = """def my_function():
     if condition:
         do_something()
@@ -210,7 +257,9 @@ after_loop()"""
 
 
 def test_flake8_clean_block_cases():
-    """Test comprehensive cases from flake8-clean-block project using test data files."""
+    """Test comprehensive cases from flake8-clean-block project using test
+    data files.
+    """
     # Read the before and after files
     import os
 

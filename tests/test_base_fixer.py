@@ -1,9 +1,11 @@
 """Tests for base_fixer.py module."""
 
-import pytest
-import tempfile
 import os
+import tempfile
 from pathlib import Path
+
+import pytest
+
 from blank_line_after_blocks.base_fixer import BaseFixer
 
 
@@ -94,7 +96,6 @@ class TestBaseFixer:
     def test_fix_one_directory_or_one_file_directory_mixed_results(
             self, return_values, expected_result
     ):
-        """Test directory processing with mixed return values."""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create test files
             py_files = []

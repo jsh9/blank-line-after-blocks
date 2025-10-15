@@ -134,7 +134,6 @@ and subsequent code.
                       self.do_work()
 +
                   self.cleanup()
-+
           except Exception as e:
               self.handle_error(e)
 +

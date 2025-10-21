@@ -1,18 +1,18 @@
-# CLAUDE.md
+# AGENTS.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with
 code in this repository.
 
-## Project Overview
+## 1. Project Overview
 
 This is a Python formatter called `blank-line-after-blocks` that automatically
 adds blank lines after if/for/while/with/try blocks to improve code
 readability. The project supports both Python source files (.py) and Jupyter
 notebooks (.ipynb).
 
-## Commands
+## 2. Commands
 
-### Testing
+### 2.1. Testing
 
 - Run all tests: `python -m pytest tests/ -v`
 - Run specific test files:
@@ -26,7 +26,7 @@ notebooks (.ipynb).
   `python -m pytest tests/ --cov=blank_line_after_blocks --cov-report=term-missing`
 - Run tox for multi-environment testing: `tox`
 
-### Code Quality
+### 2.2. Code Quality
 
 - Type checking: `mypy blank_line_after_blocks/`
 - Format code: `muff format --config=muff.toml blank_line_after_blocks tests`
@@ -35,16 +35,16 @@ notebooks (.ipynb).
 - Linting: `flake8 .`
 - Pre-commit hooks: `pre-commit run -a`
 
-### Manual Tool Testing
+### 2.3. Manual Tool Testing
 
 - Format Python files: `blank-line-after-blocks file1.py file2.py`
 - Format with exclusions:
   `blank-line-after-blocks --exclude "tests/|_generated\.py$" src/`
 - Format Jupyter notebooks: `blank-line-after-blocks-jupyter notebook.ipynb`
 
-## Architecture
+## 3. Architecture
 
-### Core Components
+### 3.1. Core Components
 
 1. **Base Architecture**: Uses inheritance with `BaseFixer` as the base class
    that handles common file processing logic
@@ -56,18 +56,18 @@ notebooks (.ipynb).
    - `JupyterFileFixer` (main_jupyter.py): Concrete implementation for Jupyter
      notebooks
 
-1. **Core Logic**: The actual formatting logic is in `helper.py` with the
+2. **Core Logic**: The actual formatting logic is in `helper.py` with the
    `fix_src()` function that processes Python source code
 
-1. **Configuration**: File exclusion patterns handled in `config.py` using
+3. **Configuration**: File exclusion patterns handled in `config.py` using
    regex matching
 
-1. **Entry Points**: Two CLI commands defined in pyproject.toml:
+4. **Entry Points**: Two CLI commands defined in pyproject.toml:
 
    - `blank-line-after-blocks` → `main_py:main`
    - `blank-line-after-blocks-jupyter` → `main_jupyter:main`
 
-### Key Design Patterns
+### 3.2. Key Design Patterns
 
 - **Template Method Pattern**: `BaseFixer` defines the file processing
   workflow, subclasses implement `fix_one_file()`
@@ -75,24 +75,24 @@ notebooks (.ipynb).
 - **Single Responsibility**: Each module has a clear focus (config, helpers,
   file processing)
 
-### Dependencies
+### 3.3. Dependencies
 
 - `click` for CLI interface
 - `jupyter-notebook-parser>=0.1.4` for Jupyter notebook processing
 - Development dependencies include pytest, mypy, pre-commit, tox
 
-## Configuration
+## 4. Configuration
 
 The tool supports exclusion patterns via:
 
 1. CLI `--exclude` flag (takes precedence)
-1. `pyproject.toml` configuration:
+2. `pyproject.toml` configuration:
    ```toml
    [tool.blank-line-after-blocks]
    exclude = ["tests/", "_generated\.py$", "vendor/", "build/"]
    ```
 
-## Python Coding Style
+## 5. Python Coding Style
 
 - Always add type hints where appropriate
 - Use "modern" type hints (such as "dict" instead of "typing.Dict")

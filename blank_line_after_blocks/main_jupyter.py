@@ -26,8 +26,9 @@ class JupyterNotebookFixer(BaseFixer):
         super().__init__(path=path, exclude_pattern=exclude_pattern)
 
     def fix_one_directory_or_one_file(self) -> int:
-        """Fix formatting in a single file or all Jupyter notebook files
-        in a directory.
+        """
+        Fix formatting in a single file or all Jupyter notebook files in a
+        directory.
         """
         from pathlib import Path
 
@@ -103,8 +104,8 @@ class JupyterNotebookFixer(BaseFixer):
     help='Regex pattern to exclude files/directories',
 )
 def main(paths: tuple[str, ...], exclude: str) -> None:
-    """Add blank lines after if/for/while/with/try blocks in Jupyter
-    notebooks.
+    """
+    Add blank lines after if/for/while/with/try blocks in Jupyter notebooks.
     """
     ret = 0
     for path in paths:

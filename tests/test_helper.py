@@ -257,8 +257,9 @@ after_loop()"""
 
 
 def test_flake8_clean_block_cases():
-    """Test comprehensive cases from flake8-clean-block project using test
-    data files.
+    """
+    Test comprehensive cases from flake8-clean-block project using test data
+    files.
     """
     # Read the before and after files
     import os

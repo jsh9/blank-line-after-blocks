@@ -3,15 +3,38 @@
 A Python formatter to automatically add blank lines after if/for/while/with/try
 blocks to improve code readability.
 
-## Installation
+<!--TOC-->
+
+______________________________________________________________________
+
+**Table of Contents**
+
+- [1. Installation](#1-installation)
+- [2. Usage](#2-usage)
+  - [2.1. Command Line](#21-command-line)
+  - [2.2. Pre-commit Hook](#22-pre-commit-hook)
+    - [2.2.1. Pre-commit with exclude patterns](#221-pre-commit-with-exclude-patterns)
+  - [2.3. Configuration File](#23-configuration-file)
+- [3. What it does](#3-what-it-does)
+- [4. Examples](#4-examples)
+  - [4.1. Basic if and for blocks](#41-basic-if-and-for-blocks)
+  - [4.2. Try/except blocks with context managers](#42-tryexcept-blocks-with-context-managers)
+  - [4.3. Nested blocks in class methods](#43-nested-blocks-in-class-methods)
+  - [4.4. Compound blocks stay tight (no blank line before else/elif/except/finally)](#44-compound-blocks-stay-tight-no-blank-line-before-elseelifexceptfinally)
+
+______________________________________________________________________
+
+<!--TOC-->
+
+## 1. Installation
 
 ```bash
 pip install blank-line-after-blocks
 ```
 
-## Usage
+## 2. Usage
 
-### Command Line
+### 2.1. Command Line
 
 ```bash
 # Format Python files
@@ -27,7 +50,7 @@ blank-line-after-blocks-jupyter notebook1.ipynb notebook2.ipynb
 blank-line-after-blocks-jupyter --exclude "notebooks/generated/" notebooks/
 ```
 
-### Pre-commit Hook
+### 2.2. Pre-commit Hook
 
 Add this to your `.pre-commit-config.yaml`:
 
@@ -40,7 +63,7 @@ repos:
       - id: blank-line-after-blocks-jupyter
 ```
 
-#### Pre-commit with exclude patterns
+#### 2.2.1. Pre-commit with exclude patterns
 
 ```yaml
 repos:
@@ -53,7 +76,7 @@ repos:
         args: ["--exclude", "notebooks/generated/"]
 ```
 
-### Configuration File
+### 2.3. Configuration File
 
 You can also configure exclude patterns in `pyproject.toml`:
 
@@ -70,7 +93,7 @@ exclude = [
 **Note**: CLI `--exclude` options take precedence over configuration file
 settings.
 
-## What it does
+## 3. What it does
 
 This tool automatically adds one blank line after the end of:
 
@@ -83,9 +106,9 @@ This tool automatically adds one blank line after the end of:
 This improves code readability by providing visual separation between blocks
 and subsequent code.
 
-## Examples
+## 4. Examples
 
-### Basic if and for blocks
+### 4.1. Basic if and for blocks
 
 ```diff
   if condition:
@@ -104,7 +127,7 @@ and subsequent code.
   a += 2
 ```
 
-### Try/except blocks with context managers
+### 4.2. Try/except blocks with context managers
 
 ```diff
   def process_files(filenames):
@@ -123,7 +146,7 @@ and subsequent code.
       return results
 ```
 
-### Nested blocks in class methods
+### 4.3. Nested blocks in class methods
 
 ```diff
   class TestClass:
@@ -140,7 +163,7 @@ and subsequent code.
           print('method complete')
 ```
 
-### Compound blocks stay tight (no blank line before else/elif/except/finally)
+### 4.4. Compound blocks stay tight (no blank line before else/elif/except/finally)
 
 If a block ends right before the second part of compound blocks (if/else,
 try/except, etc.), no blank line is added:

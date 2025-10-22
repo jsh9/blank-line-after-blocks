@@ -14,7 +14,6 @@ class BaseFixer:
             path: str,
             exclude_pattern: str = r'\.git|\.tox|\.pytest_cache',
     ) -> None:
-        """Initialize the fixer with a path and optional exclude pattern."""
         self.path = path
         self.exclude_pattern = exclude_pattern
 

@@ -1,9 +1,8 @@
 """Integration tests for blank-line-after-blocks formatter."""
 
-import os
-import pathlib
 import tempfile
 from collections.abc import Iterable
+from pathlib import Path
 
 import pytest
 
@@ -120,7 +119,7 @@ from blank_line_after_blocks.main_py import main as main_py
     ],
 )
 def test_fix_src_integration(
-    input_code: str, expected_output: str, description: str
+        input_code: str, expected_output: str, description: str
 ) -> None:
     """Test fix_src function with various real-world scenarios."""
     result = fix_src(input_code)
@@ -131,9 +130,10 @@ def _invoke_main_py(arguments: Iterable[str]) -> int:
     """Run main_py with the given arguments and return its exit code."""
     try:
         main_py(list(arguments))
-        return 0
     except SystemExit as exc:  # pragma: no cover - defensive
         return int(exc.code)
+    else:
+        return 0
 
 
 def test_end_to_end_file_processing() -> None:
@@ -203,13 +203,13 @@ if __name__ == "__main__":
         assert exit_code == 1  # Changes were made
 
         # Verify the file was modified correctly
-        with pathlib.Path(temp_filename).open(encoding='utf-8') as f:
+        with Path(temp_filename).open(encoding='utf-8') as f:
             modified_content = f.read()
 
         assert modified_content == expected_output
 
     finally:
-        pathlib.Path(temp_filename).unlink()
+        Path(temp_filename).unlink()
 
 
 def test_no_changes_needed() -> None:
@@ -236,13 +236,13 @@ print(result)
         assert exit_code == 0  # No changes were made
 
         # Verify the file was not modified
-        with pathlib.Path(temp_filename).open(encoding='utf-8') as f:
+        with Path(temp_filename).open(encoding='utf-8') as f:
             content = f.read()
 
         assert content == input_code
 
     finally:
-        pathlib.Path(temp_filename).unlink()
+        Path(temp_filename).unlink()
 
 
 @pytest.mark.integration
@@ -259,14 +259,16 @@ def test_directory_processing() -> None:
 
         expected_results = {
             'file1.py': "if True:\n    print('file1')\n\nprint('done')",
-            'file2.py': "for i in range(3):\n    print(i)\n\nprint('finished')",
+            'file2.py': (
+                "for i in range(3):\n    print(i)\n\nprint('finished')"
+            ),
             'file3.py': "# No blocks\nprint('simple')",
         }
 
         # Create the files
         for filename, content in files_data.items():
-            filepath = os.path.join(temp_dir, filename)
-            with pathlib.Path(filepath).open('w', encoding='utf-8') as f:
+            filepath = Path(temp_dir) / filename
+            with filepath.open('w', encoding='utf-8') as f:
                 f.write(content)
 
         exit_code = _invoke_main_py([temp_dir])
@@ -274,8 +276,8 @@ def test_directory_processing() -> None:
 
         # Verify results
         for filename, expected_content in expected_results.items():
-            filepath = os.path.join(temp_dir, filename)
-            with pathlib.Path(filepath).open(encoding='utf-8') as f:
+            filepath = Path(temp_dir) / filename
+            with filepath.open(encoding='utf-8') as f:
                 actual_content = f.read()
 
             assert actual_content == expected_content, (
@@ -283,8 +285,8 @@ def test_directory_processing() -> None:
             )
 
         # Verify non-Python file was not touched
-        txt_filepath = os.path.join(temp_dir, 'not_python.txt')
-        with pathlib.Path(txt_filepath).open(encoding='utf-8') as f:
+        txt_filepath = Path(temp_dir) / 'not_python.txt'
+        with txt_filepath.open(encoding='utf-8') as f:
             txt_content = f.read()
 
         assert txt_content == 'This should be ignored'
@@ -305,10 +307,10 @@ def test_syntax_error_handling() -> None:
         assert exit_code == 0
 
         # File should be unchanged
-        with pathlib.Path(temp_filename).open(encoding='utf-8') as f:
+        with Path(temp_filename).open(encoding='utf-8') as f:
             content = f.read()
 
         assert content == invalid_python
 
     finally:
-        pathlib.Path(temp_filename).unlink()
+        Path(temp_filename).unlink()

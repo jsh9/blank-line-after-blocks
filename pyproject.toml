@@ -64,8 +64,8 @@ Repository = "https://github.com/jsh9/blank-line-after-blocks.git"
 strict = true
 
 [[tool.mypy.overrides]]
-module = "jupyter_notebook_parser"
 ignore_missing_imports = true
+module = "jupyter_notebook_parser"
 
 # Test configuration
 [tool.pytest.ini_options]

@@ -1,6 +1,6 @@
 """Tests for helper.py module."""
 
-import pathlib
+from pathlib import Path
 
 import pytest
 
@@ -8,7 +8,7 @@ from blank_line_after_blocks.helper import fix_src
 
 
 @pytest.mark.parametrize(
-    'input_code,expected_output',
+    ('input_code', 'expected_output'),
     [
         # Test if statement
         (
@@ -76,7 +76,9 @@ from blank_line_after_blocks.helper import fix_src
         ),
     ],
 )
-def test_fix_src_adds_blank_lines(input_code, expected_output):
+def test_fix_src_adds_blank_lines(
+        input_code: str, expected_output: str
+) -> None:
     """Test that fix_src adds blank lines after blocks correctly."""
     result = fix_src(input_code)
     assert result == expected_output
@@ -94,7 +96,7 @@ def test_fix_src_adds_blank_lines(input_code, expected_output):
         'class MyClass:\n    def method(self):\n        pass\n\nother_code()',
     ],
 )
-def test_fix_src_no_changes_needed(input_code):
+def test_fix_src_no_changes_needed(input_code: str) -> None:
     """Test that fix_src doesn't modify code that doesn't need changes."""
     result = fix_src(input_code)
     assert result == input_code
@@ -111,14 +113,14 @@ def test_fix_src_no_changes_needed(input_code):
         'def function(\n    # incomplete function definition',
     ],
 )
-def test_fix_src_handles_syntax_errors(input_code):
+def test_fix_src_handles_syntax_errors(input_code: str) -> None:
     """Test that fix_src handles syntax errors gracefully."""
     # Should return original code unchanged when there are syntax errors
     result = fix_src(input_code)
     assert result == input_code
 
 
-def test_complex_nested_structure():
+def test_complex_nested_structure() -> None:
     """Test complex nested structure with multiple block types."""
     input_code = """if condition:
     for item in items:
@@ -151,7 +153,7 @@ final_if_step()"""
     assert result == expected
 
 
-def test_blocks_at_end_of_file():
+def test_blocks_at_end_of_file() -> None:
     """Test that blocks at the end of file are handled correctly."""
     input_code = 'if condition:\n    do_something()'
     expected = input_code  # No next line, so no blank line should be added
@@ -161,7 +163,7 @@ def test_blocks_at_end_of_file():
 
 
 @pytest.mark.parametrize(
-    'input_code,expected_output',
+    ('input_code', 'expected_output'),
     [
         # Test if-elif-else
         (
@@ -200,13 +202,13 @@ def test_blocks_at_end_of_file():
         ),
     ],
 )
-def test_compound_statements(input_code, expected_output):
+def test_compound_statements(input_code: str, expected_output: str) -> None:
     """Test compound statements (if-elif-else, try-except-finally, etc.)."""
     result = fix_src(input_code)
     assert result == expected_output
 
 
-def test_indented_blocks():
+def test_indented_blocks() -> None:
     """
     Test that indented blocks within functions/classes are handled correctly.
     """
@@ -234,7 +236,7 @@ def test_indented_blocks():
     assert result == expected
 
 
-def test_empty_blocks():
+def test_empty_blocks() -> None:
     """Test blocks with only pass statements."""
     input_code = """if condition:
     pass
@@ -258,27 +260,21 @@ after_loop()"""
     assert result == expected
 
 
-def test_flake8_clean_block_cases():
+def test_flake8_clean_block_cases() -> None:
     """
     Test comprehensive cases from flake8-clean-block project using test data
     files.
     """
-    # Read the before and after files
-    import os
-
-    test_dir = os.path.dirname(os.path.abspath(__file__))
-    before_file = os.path.join(
-        test_dir, 'test_data', 'before', 'flake8_clean_block_cases.py'
+    test_dir = Path(__file__).resolve().parent
+    before_file = (
+        test_dir / 'test_data' / 'before' / 'flake8_clean_block_cases.py'
     )
-    after_file = os.path.join(
-        test_dir, 'test_data', 'after', 'flake8_clean_block_cases.py'
+    after_file = (
+        test_dir / 'test_data' / 'after' / 'flake8_clean_block_cases.py'
     )
 
-    with pathlib.Path(before_file).open() as f:
-        input_code = f.read()
-
-    with pathlib.Path(after_file).open() as f:
-        expected_output = f.read()
+    input_code = before_file.read_text()
+    expected_output = after_file.read_text()
 
     # Apply the fix_src function to the input
     result = fix_src(input_code)

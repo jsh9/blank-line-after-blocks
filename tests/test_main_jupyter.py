@@ -83,12 +83,16 @@ class TestJupyterNotebookFixer:
             temp_filename = f.name
 
         try:
-            with patch(
-                'blank_line_after_blocks.main_jupyter.reconstruct_source',
-                return_value=(
-                    'if condition:\\n    do_something()\\n\\nnext_line()'
+            with (
+                patch(
+                    'blank_line_after_blocks.main_jupyter.reconstruct_source',
+                    return_value=(
+                        'if condition:\\n    do_something()\\n\\nnext_line()'
+                    ),
                 ),
-            ), patch('builtins.open', create=True), patch('json.dump'):
+                patch('builtins.open', create=True),
+                patch('json.dump'),
+            ):
                 result = fixer.fix_one_file(temp_filename)
 
                 # Should return 1 (changes were made and

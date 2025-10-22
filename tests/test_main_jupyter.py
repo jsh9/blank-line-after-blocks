@@ -3,6 +3,7 @@
 import json
 import pathlib
 import tempfile
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -10,212 +11,211 @@ import pytest
 from blank_line_after_blocks.main_jupyter import JupyterNotebookFixer, main
 
 
-class TestJupyterNotebookFixer:
-    """Test the JupyterNotebookFixer class."""
-
-    @pytest.fixture
-    def sample_notebook(self):
-        """Create a sample Jupyter notebook structure."""
-        return {
-            'cells': [
-                {
-                    'cell_type': 'code',
-                    'source': [
-                        'if condition:\n',
-                        '    do_something()\n',
-                        'next_line()',
-                    ],
-                },
-                {'cell_type': 'markdown', 'source': ['# This is markdown']},
-                {
-                    'cell_type': 'code',
-                    'source': [
-                        'for item in items:\n',
-                        '    process(item)\n',
-                        'after_loop()',
-                    ],
-                },
-            ],
-            'metadata': {},
-            'nbformat': 4,
-            'nbformat_minor': 4,
-        }
-
-    @pytest.fixture
-    def fixer(self):
-        """Create a JupyterNotebookFixer instance."""
-        return JupyterNotebookFixer(path='test.ipynb')
-
-    @patch('blank_line_after_blocks.main_jupyter.JupyterNotebookParser')
-    @patch('blank_line_after_blocks.main_jupyter.JupyterNotebookRewriter')
-    def test_fix_one_file_with_changes(
-            self,
-            mock_rewriter_class,
-            mock_parser_class,
-            fixer,
-            sample_notebook,
-    ):
-        """Test fix_one_file when changes are made to notebook cells."""
-        # Setup mocks
-        mock_parser = MagicMock()
-        mock_rewriter = MagicMock()
-        mock_parser_class.return_value = mock_parser
-        mock_rewriter_class.return_value = mock_rewriter
-
-        # Mock source code container
-        mock_source_container = MagicMock()
-        mock_source_container.source_without_magic = (
-            'if condition:\n    do_something()\nnext_line()'
-        )
-        mock_source_container.magics = {}
-
-        mock_parser.get_code_cells.return_value = [sample_notebook['cells'][0]]
-        mock_parser.get_code_cell_indices.return_value = [0]
-        mock_parser.get_code_cell_sources.return_value = [
-            mock_source_container
-        ]
-        mock_parser.notebook_content = sample_notebook
-
-        with tempfile.NamedTemporaryFile(
-            mode='w', suffix='.ipynb', delete=False
-        ) as f:
-            json.dump(sample_notebook, f)
-            temp_filename = f.name
-
-        try:
-            with (
-                patch(
-                    'blank_line_after_blocks.main_jupyter.reconstruct_source',
-                    return_value=(
-                        'if condition:\\n    do_something()\\n\\nnext_line()'
-                    ),
-                ),
-                patch('builtins.open', create=True),
-                patch('json.dump'),
-            ):
-                result = fixer.fix_one_file(temp_filename)
-
-                # Should return 1 (changes were made and
-                # exit_zero_even_if_changed is False)
-                assert result == 1
-
-                # Should call replace_source_in_code_cell
-                mock_method = mock_rewriter.replace_source_in_code_cell
-                mock_method.assert_called_once()
-
-        finally:
-            pathlib.Path(temp_filename).unlink()
-
-    @patch('blank_line_after_blocks.main_jupyter.JupyterNotebookParser')
-    def test_fix_one_file_parse_error(self, mock_parser_class, fixer):
-        """Test fix_one_file when notebook parsing fails."""
-        import tempfile
-
-        mock_parser_class.side_effect = Exception('Parse error')
-
-        # Create a temporary file so the file existence check passes
-        with tempfile.NamedTemporaryFile(
-            mode='w', suffix='.ipynb', delete=False
-        ) as f:
-            f.write('{}')  # Write minimal content
-            temp_filename = f.name
-
-        try:
-            with patch('sys.stderr'):
-                result = fixer.fix_one_file(temp_filename)
-                assert result == 1
-        finally:
-            pathlib.Path(temp_filename).unlink()
-
-    @patch('blank_line_after_blocks.main_jupyter.JupyterNotebookParser')
-    @patch('blank_line_after_blocks.main_jupyter.JupyterNotebookRewriter')
-    def test_fix_one_file_no_changes(
-            self, mock_rewriter_class, mock_parser_class, fixer
-    ):
-        """Test fix_one_file when no changes are needed."""
-        # Setup mocks
-        mock_parser = MagicMock()
-        mock_rewriter = MagicMock()
-        mock_parser_class.return_value = mock_parser
-        mock_rewriter_class.return_value = mock_rewriter
-
-        # Mock source that doesn't need fixing
-        mock_source_container = MagicMock()
-        mock_source_container.source_without_magic = 'simple_statement()'
-        mock_source_container.magics = {}
-
-        mock_parser.get_code_cells.return_value = [{}]
-        mock_parser.get_code_cell_indices.return_value = [0]
-        mock_parser.get_code_cell_sources.return_value = [
-            mock_source_container
-        ]
-
-        result = fixer.fix_one_file('test.ipynb')
-
-        # Should return 0 (no changes made)
-        assert result == 0
-
-        # Should not call replace_source_in_code_cell
-        mock_rewriter.replace_source_in_code_cell.assert_not_called()
-
-
-class TestJupyterMain:
-    """Test the main function for Jupyter notebooks."""
-
-    @pytest.mark.parametrize(
-        'argv,expected_paths',
-        [
-            (
-                ['notebook1.ipynb', 'notebook2.ipynb'],
-                ['notebook1.ipynb', 'notebook2.ipynb'],
-            ),
-            ([], []),
+@pytest.fixture
+def sample_notebook() -> dict[str, Any]:
+    """Create a sample Jupyter notebook structure."""
+    return {
+        'cells': [
+            {
+                'cell_type': 'code',
+                'source': [
+                    'if condition:\n',
+                    '    do_something()\n',
+                    'next_line()',
+                ],
+            },
+            {'cell_type': 'markdown', 'source': ['# This is markdown']},
+            {
+                'cell_type': 'code',
+                'source': [
+                    'for item in items:\n',
+                    '    process(item)\n',
+                    'after_loop()',
+                ],
+            },
         ],
+        'metadata': {},
+        'nbformat': 4,
+        'nbformat_minor': 4,
+    }
+
+
+@pytest.fixture
+def fixer() -> JupyterNotebookFixer:
+    """Create a JupyterNotebookFixer instance."""
+    return JupyterNotebookFixer(path='test.ipynb')
+
+
+@patch('blank_line_after_blocks.main_jupyter.JupyterNotebookParser')
+@patch('blank_line_after_blocks.main_jupyter.JupyterNotebookRewriter')
+def test_fix_one_file_with_changes(
+        mock_rewriter_class: MagicMock,
+        mock_parser_class: MagicMock,
+        fixer: JupyterNotebookFixer,
+        sample_notebook: dict[str, Any],
+) -> None:
+    """Test fix_one_file when changes are made to notebook cells."""
+    # Setup mocks
+    mock_parser = MagicMock()
+    mock_rewriter = MagicMock()
+    mock_parser_class.return_value = mock_parser
+    mock_rewriter_class.return_value = mock_rewriter
+
+    # Mock source code container
+    mock_source_container = MagicMock()
+    mock_source_container.source_without_magic = (
+        'if condition:\n    do_something()\nnext_line()'
     )
-    def test_main_argument_parsing(self, argv, expected_paths):
-        """Test that main function parses arguments correctly."""
-        with patch(
-            'blank_line_after_blocks.main_jupyter.JupyterNotebookFixer'
-        ) as MockFixer:
-            # Mock the fixer to return 0 (no changes)
-            mock_fixer_instance = MockFixer.return_value
-            mock_fixer_instance.fix_one_directory_or_one_file.return_value = 0
+    mock_source_container.magics = {}
 
-            # Click's main() always calls sys.exit, even for successful runs
-            with pytest.raises(SystemExit) as exc_info:
-                main(argv)
+    mock_parser.get_code_cells.return_value = [sample_notebook['cells'][0]]
+    mock_parser.get_code_cell_indices.return_value = [0]
+    mock_parser.get_code_cell_sources.return_value = [mock_source_container]
+    mock_parser.notebook_content = sample_notebook
 
-            # Should exit with 0 since no changes were made
-            assert exc_info.value.code == 0
+    with tempfile.NamedTemporaryFile(
+        mode='w', suffix='.ipynb', delete=False, encoding='utf-8'
+    ) as f:
+        json.dump(sample_notebook, f)
+        temp_filename = f.name
 
-            # Check that the correct number of fixers were created
-            assert MockFixer.call_count == len(expected_paths)
+    try:
+        with (
+            patch(
+                'blank_line_after_blocks.main_jupyter.reconstruct_source',
+                return_value=(
+                    'if condition:\\n    do_something()\\n\\nnext_line()'
+                ),
+            ),
+            patch('builtins.open', create=True),
+            patch('json.dump'),
+        ):
+            result = fixer.fix_one_file(temp_filename)
 
-            # Check that the correct paths were passed to fixers
-            for i, expected_path in enumerate(expected_paths):
-                args, kwargs = MockFixer.call_args_list[i]
-                assert kwargs['path'] == expected_path
+            # Should return 1 (changes were made and
+            # exit_zero_even_if_changed False)
+            assert result == 1
 
-    def test_main_returns_error_code(self):
-        """Test that main raises SystemExit when changes are made."""
-        with patch(
-            'blank_line_after_blocks.main_jupyter.JupyterNotebookFixer'
-        ) as MockFixer:
-            # Mock the fixer to return 1 (changes were made)
-            mock_fixer_instance = MockFixer.return_value
-            mock_fixer_instance.fix_one_directory_or_one_file.return_value = 1
+            # Should call replace_source_in_code_cell
+            mock_method = mock_rewriter.replace_source_in_code_cell
+            mock_method.assert_called_once()
 
-            with pytest.raises(SystemExit) as exc_info:
-                main(['test.ipynb'])
+    finally:
+        pathlib.Path(temp_filename).unlink()
 
-            # Should raise SystemExit with code 1 when changes were made
-            assert exc_info.value.code == 1
 
-    def test_main_no_arguments(self):
-        """Test main with no arguments."""
-        # Click's main() always calls sys.exit, even when no files processed
+@patch('blank_line_after_blocks.main_jupyter.JupyterNotebookParser')
+def test_fix_one_file_parse_error(
+        mock_parser_class: MagicMock, fixer: JupyterNotebookFixer
+) -> None:
+    """Test fix_one_file when notebook parsing fails."""
+    mock_parser_class.side_effect = Exception('Parse error')
+
+    # Create a temporary file so the file existence check passes
+    with tempfile.NamedTemporaryFile(
+        mode='w', suffix='.ipynb', delete=False, encoding='utf-8'
+    ) as f:
+        f.write('{}')  # Write minimal content
+        temp_filename = f.name
+
+    try:
+        with patch('sys.stderr'):
+            result = fixer.fix_one_file(temp_filename)
+            assert result == 1
+    finally:
+        pathlib.Path(temp_filename).unlink()
+
+
+@patch('blank_line_after_blocks.main_jupyter.JupyterNotebookParser')
+@patch('blank_line_after_blocks.main_jupyter.JupyterNotebookRewriter')
+def test_fix_one_file_no_changes(
+        mock_rewriter_class: MagicMock,
+        mock_parser_class: MagicMock,
+        fixer: JupyterNotebookFixer,
+) -> None:
+    """Test fix_one_file when no changes are needed."""
+    # Setup mocks
+    mock_parser = MagicMock()
+    mock_rewriter = MagicMock()
+    mock_parser_class.return_value = mock_parser
+    mock_rewriter_class.return_value = mock_rewriter
+
+    # Mock source that doesn't need fixing
+    mock_source_container = MagicMock()
+    mock_source_container.source_without_magic = 'simple_statement()'
+    mock_source_container.magics = {}
+
+    mock_parser.get_code_cells.return_value = [{}]
+    mock_parser.get_code_cell_indices.return_value = [0]
+    mock_parser.get_code_cell_sources.return_value = [mock_source_container]
+
+    result = fixer.fix_one_file('test.ipynb')
+
+    # Should return 0 (no changes made)
+    assert result == 0
+
+    # Should not call replace_source_in_code_cell
+    mock_rewriter.replace_source_in_code_cell.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ('argv', 'expected_paths'),
+    [
+        (
+            ['notebook1.ipynb', 'notebook2.ipynb'],
+            ['notebook1.ipynb', 'notebook2.ipynb'],
+        ),
+        ([], []),
+    ],
+)
+def test_main_argument_parsing(
+        argv: list[str], expected_paths: list[str]
+) -> None:
+    """Test that main function parses arguments correctly."""
+    with patch(
+        'blank_line_after_blocks.main_jupyter.JupyterNotebookFixer'
+    ) as mock_fixer_cls:
+        # Mock the fixer to return 0 (no changes)
+        mock_fixer_instance = mock_fixer_cls.return_value
+        mock_fixer_instance.fix_one_directory_or_one_file.return_value = 0
+
+        # Click's main() always calls sys.exit, even for successful runs
         with pytest.raises(SystemExit) as exc_info:
-            main([])
+            main(argv)
 
-        # Should exit with 0 when no files are processed (no changes made)
+        # Should exit with 0 since no changes were made
         assert exc_info.value.code == 0
+
+        # Check that the correct number of fixers were created
+        assert mock_fixer_cls.call_count == len(expected_paths)
+
+        # Check that the correct paths were passed to fixers
+        for i, expected_path in enumerate(expected_paths):
+            _args, kwargs = mock_fixer_cls.call_args_list[i]
+            assert kwargs['path'] == expected_path
+
+
+def test_main_returns_error_code() -> None:
+    """Test that main raises SystemExit when changes are made."""
+    with patch(
+        'blank_line_after_blocks.main_jupyter.JupyterNotebookFixer'
+    ) as mock_fixer_cls:
+        # Mock the fixer to return 1 (changes were made)
+        mock_fixer_instance = mock_fixer_cls.return_value
+        mock_fixer_instance.fix_one_directory_or_one_file.return_value = 1
+
+        with pytest.raises(SystemExit) as exc_info:
+            main(['test.ipynb'])
+
+        # Should raise SystemExit with code 1 when changes were made
+        assert exc_info.value.code == 1
+
+
+def test_main_no_arguments() -> None:
+    """Test main with no arguments."""
+    # Click's main() always calls sys.exit, even when no files processed
+    with pytest.raises(SystemExit) as exc_info:
+        main([])
+
+    # Should exit with 0 when no files are processed (no changes made)
+    assert exc_info.value.code == 0

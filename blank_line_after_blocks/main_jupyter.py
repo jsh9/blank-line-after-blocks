@@ -29,8 +29,6 @@ class JupyterNotebookFixer(BaseFixer):
         Fix formatting in a single file or all Jupyter notebook files in a
         directory.
         """
-        from pathlib import Path
-
         path_obj = Path(self.path)
 
         if path_obj.is_file():
@@ -60,7 +58,7 @@ class JupyterNotebookFixer(BaseFixer):
             code_cells = parsed.get_code_cells()
             code_cell_indices = parsed.get_code_cell_indices()
             code_cell_sources = parsed.get_code_cell_sources()
-        except Exception as exc:
+        except (NameError, ValueError) as exc:
             print(f'Error reading {filename}: {exc!s}', file=sys.stderr)
             return 1
         else:
@@ -85,7 +83,7 @@ class JupyterNotebookFixer(BaseFixer):
 
             if ret_val == 1:
                 print(f'Rewriting {filename}', file=sys.stderr)
-                with Path(filename).open('w') as fp:
+                with Path(filename).open('w', encoding='utf-8') as fp:
                     json.dump(parsed.notebook_content, fp, indent=1)
                     # Jupyter notebooks (.ipynb) always ends with a new line
                     # but json.dump does not.

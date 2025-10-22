@@ -45,7 +45,8 @@ class JupyterNotebookFixer(BaseFixer):
 
         return 0 if not all_status or all_status == {0} else 1
 
-    def fix_one_file(self, filename: str) -> int:
+    @staticmethod
+    def fix_one_file(filename: str) -> int:
         """Fix formatting in a single Jupyter notebook file."""
         file_path = Path(filename)
         if not file_path.is_file():

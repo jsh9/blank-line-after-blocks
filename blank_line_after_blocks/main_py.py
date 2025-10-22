@@ -20,7 +20,8 @@ class PythonFileFixer(BaseFixer):
     ) -> None:
         super().__init__(path=path, exclude_pattern=exclude_pattern)
 
-    def fix_one_file(self, filename: str) -> int:
+    @staticmethod
+    def fix_one_file(filename: str) -> int:
         """Fix formatting in a single Python file."""
         if filename == '-':
             source_bytes = sys.stdin.buffer.read()

@@ -49,6 +49,7 @@ class BaseFixer:
 
         return 0 if not all_status or all_status == {0} else 1
 
-    def fix_one_file(self, *varargs: Any, **kwargs: Any) -> int:
+    @staticmethod
+    def fix_one_file(*varargs: Any, **kwargs: Any) -> int:
         """Fix formatting in a single file."""
         raise NotImplementedError('Please implement this method')

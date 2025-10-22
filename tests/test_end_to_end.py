@@ -1,6 +1,5 @@
 """End-to-end tests using real before/after file pairs."""
 
-import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -87,7 +86,7 @@ class TestEndToEnd:
                 exit_code = e.code
 
             # Read the formatted content
-            with open(temp_filename) as f:
+            with Path(temp_filename).open() as f:
                 formatted_content = f.read()
 
             # Get expected content
@@ -109,7 +108,7 @@ class TestEndToEnd:
                 )
 
         finally:
-            os.unlink(temp_filename)
+            Path(temp_filename).unlink()
 
     def test_directory_processing_py(self, test_data_dir):
         """Test processing an entire directory of Python files."""
@@ -140,8 +139,8 @@ class TestEndToEnd:
                 expected_file = test_data_dir / 'after' / before_file.name
 
                 with (
-                    open(temp_file_path) as temp_f,
-                    open(expected_file) as expected_f,
+                    Path(temp_file_path).open() as temp_f,
+                    Path(expected_file).open() as expected_f,
                 ):
                     assert temp_f.read() == expected_f.read(), (
                         f'Directory processing failed for {before_file.name}'
@@ -176,8 +175,8 @@ class TestEndToEnd:
                 expected_file = test_data_dir / 'after' / before_file.name
 
                 with (
-                    open(temp_file_path) as temp_f,
-                    open(expected_file) as expected_f,
+                    Path(temp_file_path).open() as temp_f,
+                    Path(expected_file).open() as expected_f,
                 ):
                     assert temp_f.read() == expected_f.read(), (
                         f'Directory processing failed for {before_file.name}'
@@ -209,7 +208,7 @@ class TestEndToEnd:
                 assert exit_code == 0, f'Expected no changes for {filename}'
 
                 # Verify content is unchanged
-                with open(temp_filename) as f:
+                with Path(temp_filename).open() as f:
                     content = f.read()
 
                 assert content == before_file.read_text(), (
@@ -217,7 +216,7 @@ class TestEndToEnd:
                 )
 
             finally:
-                os.unlink(temp_filename)
+                Path(temp_filename).unlink()
 
     def test_files_requiring_changes_return_one(self, test_data_dir):
         """Test that files requiring changes return exit code 1."""
@@ -247,7 +246,7 @@ class TestEndToEnd:
                 assert exit_code == 1, f'Expected changes for {filename}'
 
                 # Verify content actually changed
-                with open(temp_filename) as f:
+                with Path(temp_filename).open() as f:
                     content = f.read()
 
                 assert content != before_file.read_text(), (
@@ -255,7 +254,7 @@ class TestEndToEnd:
                 )
 
             finally:
-                os.unlink(temp_filename)
+                Path(temp_filename).unlink()
 
     def test_exit_zero_flag(self, test_data_dir):
         """Test that there is no --exit-zero-even-if-changed flag anymore."""
@@ -273,7 +272,7 @@ class TestEndToEnd:
                 main_py([temp_filename, '--exit-zero-even-if-changed'])
 
         finally:
-            os.unlink(temp_filename)
+            Path(temp_filename).unlink()
 
     def test_multiple_files(self, test_data_dir):
         """Test processing multiple files at once."""
@@ -305,8 +304,8 @@ class TestEndToEnd:
             for i, filename in enumerate(filenames):
                 expected_file = test_data_dir / 'after' / filename
                 with (
-                    open(temp_files[i]) as temp_f,
-                    open(expected_file) as expected_f,
+                    Path(temp_files[i]).open() as temp_f,
+                    Path(expected_file).open() as expected_f,
                 ):
                     assert temp_f.read() == expected_f.read(), (
                         f'Multiple file processing failed for {filename}'
@@ -314,7 +313,7 @@ class TestEndToEnd:
 
         finally:
             for temp_file in temp_files:
-                os.unlink(temp_file)
+                Path(temp_file).unlink()
 
     def test_comprehensive_scenarios(self, test_data_dir):
         """Test that all test scenarios work as expected."""

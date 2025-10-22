@@ -50,10 +50,9 @@ def _collect_blocks_to_fix(tree: ast.Module) -> set[int]:
                     and node.orelse[-1].end_lineno is not None
                 ):
                     blocks_to_fix.add(node.orelse[-1].end_lineno)
-            else:
-                # For other blocks, add blank line after entire construct
-                if hasattr(node, 'end_lineno') and node.end_lineno is not None:
-                    blocks_to_fix.add(node.end_lineno)
+            # For other blocks, add blank line after entire construct
+            elif hasattr(node, 'end_lineno') and node.end_lineno is not None:
+                blocks_to_fix.add(node.end_lineno)
 
     return blocks_to_fix
 

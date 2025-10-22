@@ -1,6 +1,6 @@
 """Tests for main_py.py module."""
 
-import os
+import pathlib
 import tempfile
 from unittest.mock import patch
 
@@ -36,13 +36,13 @@ class TestPythonFileFixer:
             assert result == 1
 
             # Check that file was modified
-            with open(temp_filename) as f:
+            with pathlib.Path(temp_filename).open() as f:
                 modified_content = f.read()
 
             assert modified_content == expected_code
 
         finally:
-            os.unlink(temp_filename)
+            pathlib.Path(temp_filename).unlink()
 
     def test_fix_one_file_no_changes(self, fixer):
         """Test fix_one_file when no changes are needed."""
@@ -61,13 +61,13 @@ class TestPythonFileFixer:
             assert result == 0
 
             # Check that file was not modified
-            with open(temp_filename) as f:
+            with pathlib.Path(temp_filename).open() as f:
                 content = f.read()
 
             assert content == input_code
 
         finally:
-            os.unlink(temp_filename)
+            pathlib.Path(temp_filename).unlink()
 
     @patch('sys.stdin')
     @patch('builtins.print')
@@ -104,7 +104,7 @@ class TestPythonFileFixer:
                 assert result == 1
 
         finally:
-            os.unlink(temp_filename)
+            pathlib.Path(temp_filename).unlink()
 
 
 class TestMainFunction:

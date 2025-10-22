@@ -1,5 +1,7 @@
 """Tests for helper.py module."""
 
+import pathlib
+
 import pytest
 
 from blank_line_after_blocks.helper import fix_src
@@ -272,10 +274,10 @@ def test_flake8_clean_block_cases():
         test_dir, 'test_data', 'after', 'flake8_clean_block_cases.py'
     )
 
-    with open(before_file) as f:
+    with pathlib.Path(before_file).open() as f:
         input_code = f.read()
 
-    with open(after_file) as f:
+    with pathlib.Path(after_file).open() as f:
         expected_output = f.read()
 
     # Apply the fix_src function to the input

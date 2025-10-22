@@ -1,7 +1,7 @@
 """Tests for main_jupyter.py module."""
 
 import json
-import os
+import pathlib
 import tempfile
 from unittest.mock import MagicMock, patch
 
@@ -88,26 +88,23 @@ class TestJupyterNotebookFixer:
                 return_value=(
                     'if condition:\\n    do_something()\\n\\nnext_line()'
                 ),
-            ):
-                with patch('builtins.open', create=True):
-                    with patch('json.dump'):
-                        result = fixer.fix_one_file(temp_filename)
+            ), patch('builtins.open', create=True), patch('json.dump'):
+                result = fixer.fix_one_file(temp_filename)
 
-                        # Should return 1 (changes were made and
-                        # exit_zero_even_if_changed is False)
-                        assert result == 1
+                # Should return 1 (changes were made and
+                # exit_zero_even_if_changed is False)
+                assert result == 1
 
-                        # Should call replace_source_in_code_cell
-                        mock_method = mock_rewriter.replace_source_in_code_cell
-                        mock_method.assert_called_once()
+                # Should call replace_source_in_code_cell
+                mock_method = mock_rewriter.replace_source_in_code_cell
+                mock_method.assert_called_once()
 
         finally:
-            os.unlink(temp_filename)
+            pathlib.Path(temp_filename).unlink()
 
     @patch('blank_line_after_blocks.main_jupyter.JupyterNotebookParser')
     def test_fix_one_file_parse_error(self, mock_parser_class, fixer):
         """Test fix_one_file when notebook parsing fails."""
-        import os
         import tempfile
 
         mock_parser_class.side_effect = Exception('Parse error')
@@ -124,7 +121,7 @@ class TestJupyterNotebookFixer:
                 result = fixer.fix_one_file(temp_filename)
                 assert result == 1
         finally:
-            os.unlink(temp_filename)
+            pathlib.Path(temp_filename).unlink()
 
     @patch('blank_line_after_blocks.main_jupyter.JupyterNotebookParser')
     @patch('blank_line_after_blocks.main_jupyter.JupyterNotebookRewriter')

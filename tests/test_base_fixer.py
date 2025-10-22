@@ -50,7 +50,7 @@ class TestBaseFixer:
             assert Path(fixer.processed_files[0]) == Path(temp_filename)
 
         finally:
-            os.unlink(temp_filename)
+            Path(temp_filename).unlink()
 
     def test_fix_one_directory_or_one_file_directory(self):
         """Test fixing all Python files in a directory."""
@@ -62,14 +62,14 @@ class TestBaseFixer:
 
             # Create subdirectory with Python file
             sub_dir = os.path.join(temp_dir, 'subdir')
-            os.makedirs(sub_dir)
+            Path(sub_dir).mkdir(parents=True)
             py_file3 = os.path.join(sub_dir, 'test3.py')
 
             for py_file in [py_file1, py_file2, py_file3]:
-                with open(py_file, 'w') as f:
+                with Path(py_file).open('w') as f:
                     f.write('# test content')
 
-            with open(txt_file, 'w') as f:
+            with Path(txt_file).open('w') as f:
                 f.write('not a python file')
 
             fixer = ConcreteFixer(path=temp_dir, return_value=0)
@@ -101,7 +101,7 @@ class TestBaseFixer:
             py_files = []
             for i, _return_val in enumerate(return_values):
                 py_file = os.path.join(temp_dir, f'test{i}.py')
-                with open(py_file, 'w') as f:
+                with Path(py_file).open('w') as f:
                     f.write('# test content')
 
                 py_files.append(py_file)
@@ -161,10 +161,10 @@ class TestBaseFixer:
             txt_file = os.path.join(temp_dir, 'test.txt')
             js_file = os.path.join(temp_dir, 'test.js')
 
-            with open(txt_file, 'w') as f:
+            with Path(txt_file).open('w') as f:
                 f.write('not python')
 
-            with open(js_file, 'w') as f:
+            with Path(js_file).open('w') as f:
                 f.write('also not python')
 
             fixer = ConcreteFixer(path=temp_dir)
@@ -183,11 +183,11 @@ class TestBaseFixer:
             # Create subdirectory with Python file (should be excluded
             # by pattern)
             sub_dir = os.path.join(temp_dir, 'subdir')
-            os.makedirs(sub_dir)
+            Path(sub_dir).mkdir(parents=True)
             py_file3 = os.path.join(sub_dir, 'test.py')
 
             for py_file in [py_file1, py_file2, py_file3]:
-                with open(py_file, 'w') as f:
+                with Path(py_file).open('w') as f:
                     f.write('# test content')
 
             # Use regex pattern to exclude files with 'excluded' in
@@ -212,7 +212,7 @@ class TestBaseFixer:
             py_file2 = os.path.join(temp_dir, 'test_cli_excluded.py')
 
             for py_file in [py_file1, py_file2]:
-                with open(py_file, 'w') as f:
+                with Path(py_file).open('w') as f:
                     f.write('# test content')
 
             # Use regex pattern to exclude files with 'cli_excluded' in name
@@ -236,7 +236,7 @@ class TestBaseFixer:
             py_file2 = os.path.join(temp_dir, 'test2.py')
 
             for py_file in [py_file1, py_file2]:
-                with open(py_file, 'w') as f:
+                with Path(py_file).open('w') as f:
                     f.write('# test content')
 
             # Empty exclude pattern should process all files
@@ -272,7 +272,7 @@ class TestBaseFixer:
             assert len(fixer.processed_files) == 0
 
         finally:
-            os.unlink(temp_filename)
+            Path(temp_filename).unlink()
 
     def test_exclude_single_file_not_matching_pattern(self):
         """Test that single files not matching pattern are processed."""
@@ -298,4 +298,4 @@ class TestBaseFixer:
             assert Path(fixer.processed_files[0]) == Path(temp_filename)
 
         finally:
-            os.unlink(temp_filename)
+            Path(temp_filename).unlink()

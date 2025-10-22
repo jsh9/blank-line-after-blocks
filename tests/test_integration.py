@@ -1,6 +1,7 @@
 """Integration tests for blank-line-after-blocks formatter."""
 
 import os
+import pathlib
 import tempfile
 
 import pytest
@@ -200,13 +201,13 @@ if __name__ == "__main__":
             assert exit_code == 1  # Changes were made
 
             # Verify the file was modified correctly
-            with open(temp_filename) as f:
+            with pathlib.Path(temp_filename).open() as f:
                 modified_content = f.read()
 
             assert modified_content == expected_output
 
         finally:
-            os.unlink(temp_filename)
+            pathlib.Path(temp_filename).unlink()
 
     def test_no_changes_needed(self):
         """Test that files needing no changes are not modified."""
@@ -237,13 +238,13 @@ print(result)
             assert exit_code == 0  # No changes were made
 
             # Verify the file was not modified
-            with open(temp_filename) as f:
+            with pathlib.Path(temp_filename).open() as f:
                 content = f.read()
 
             assert content == input_code
 
         finally:
-            os.unlink(temp_filename)
+            pathlib.Path(temp_filename).unlink()
 
     @pytest.mark.integration
     def test_directory_processing(self):
@@ -252,7 +253,7 @@ print(result)
             # Create test files
             files_data = {
                 'file1.py': "if True:\n    print('file1')\nprint('done')",
-                'file2.py': (  # noqa: PAR001
+                'file2.py': (
                     "for i in range(3):\n    print(i)\nprint('finished')"
                 ),
                 'file3.py': "# No blocks\nprint('simple')",
@@ -261,7 +262,7 @@ print(result)
 
             expected_results = {
                 'file1.py': "if True:\n    print('file1')\n\nprint('done')",
-                'file2.py': (  # noqa: PAR001
+                'file2.py': (
                     "for i in range(3):\n    print(i)\n\nprint('finished')"
                 ),
                 'file3.py': "# No blocks\nprint('simple')",
@@ -270,7 +271,7 @@ print(result)
             # Create the files
             for filename, content in files_data.items():
                 filepath = os.path.join(temp_dir, filename)
-                with open(filepath, 'w') as f:
+                with pathlib.Path(filepath).open('w') as f:
                     f.write(content)
 
             # Process the directory
@@ -285,7 +286,7 @@ print(result)
             # Verify results
             for filename, expected_content in expected_results.items():
                 filepath = os.path.join(temp_dir, filename)
-                with open(filepath) as f:
+                with pathlib.Path(filepath).open() as f:
                     actual_content = f.read()
 
                 assert actual_content == expected_content, (
@@ -294,7 +295,7 @@ print(result)
 
             # Verify non-Python file was not touched
             txt_filepath = os.path.join(temp_dir, 'not_python.txt')
-            with open(txt_filepath) as f:
+            with pathlib.Path(txt_filepath).open() as f:
                 txt_content = f.read()
 
             assert txt_content == 'This should be ignored'
@@ -322,10 +323,10 @@ print(result)
             assert exit_code == 0
 
             # File should be unchanged
-            with open(temp_filename) as f:
+            with pathlib.Path(temp_filename).open() as f:
                 content = f.read()
 
             assert content == invalid_python
 
         finally:
-            os.unlink(temp_filename)
+            pathlib.Path(temp_filename).unlink()

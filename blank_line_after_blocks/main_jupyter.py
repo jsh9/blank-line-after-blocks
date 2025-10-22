@@ -10,8 +10,7 @@ from jupyter_notebook_parser import (
     reconstruct_source,
 )
 
-import blank_line_after_blocks.helper as helper
-from blank_line_after_blocks import __version__
+from blank_line_after_blocks import __version__, helper
 from blank_line_after_blocks.base_fixer import BaseFixer
 
 
@@ -61,7 +60,7 @@ class JupyterNotebookFixer(BaseFixer):
             code_cell_indices = parsed.get_code_cell_indices()
             code_cell_sources = parsed.get_code_cell_sources()
         except Exception as exc:
-            print(f'Error reading {filename}: {str(exc)}', file=sys.stderr)
+            print(f'Error reading {filename}: {exc!s}', file=sys.stderr)
             return 1
         else:
             ret_val = 0
@@ -85,7 +84,7 @@ class JupyterNotebookFixer(BaseFixer):
 
             if ret_val == 1:
                 print(f'Rewriting {filename}', file=sys.stderr)
-                with open(filename, 'w') as fp:
+                with Path(filename).open('w') as fp:
                     json.dump(parsed.notebook_content, fp, indent=1)
                     # Jupyter notebooks (.ipynb) always ends with a new line
                     # but json.dump does not.

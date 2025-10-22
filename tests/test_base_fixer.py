@@ -1,6 +1,5 @@
 """Tests for base_fixer.py module."""
 
-import os
 import tempfile
 from pathlib import Path
 
@@ -54,21 +53,22 @@ def test_fix_one_directory_or_one_file_single_file() -> None:
 def test_fix_one_directory_or_one_file_directory() -> None:
     """Test fixing all Python files in a directory."""
     with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
         # Create test files
-        py_file1 = os.path.join(temp_dir, 'test1.py')
-        py_file2 = os.path.join(temp_dir, 'test2.py')
-        txt_file = os.path.join(temp_dir, 'test.txt')  # Should be ignored
+        py_file1 = temp_path / 'test1.py'
+        py_file2 = temp_path / 'test2.py'
+        txt_file = temp_path / 'test.txt'  # Should be ignored
 
         # Create subdirectory with Python file
-        sub_dir = os.path.join(temp_dir, 'subdir')
-        Path(sub_dir).mkdir(parents=True)
-        py_file3 = os.path.join(sub_dir, 'test3.py')
+        sub_dir = temp_path / 'subdir'
+        sub_dir.mkdir(parents=True)
+        py_file3 = sub_dir / 'test3.py'
 
-        for py_file in [py_file1, py_file2, py_file3]:
-            with Path(py_file).open('w', encoding='utf-8') as f:
+        for py_file in (py_file1, py_file2, py_file3):
+            with py_file.open('w', encoding='utf-8') as f:
                 f.write('# test content')
 
-        with Path(txt_file).open('w', encoding='utf-8') as f:
+        with txt_file.open('w', encoding='utf-8') as f:
             f.write('not a python file')
 
         fixer = ConcreteFixer(path=temp_dir, return_value=0)
@@ -97,14 +97,15 @@ def test_fix_one_directory_or_one_file_directory_mixed_results(
         return_values: list[int], expected_result: int
 ) -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
         # Create test files
         py_files: list[str] = []
         for i, _return_val in enumerate(return_values):
-            py_file = os.path.join(temp_dir, f'test{i}.py')
-            with Path(py_file).open('w', encoding='utf-8') as f:
+            py_file = temp_path / f'test{i}.py'
+            with py_file.open('w', encoding='utf-8') as f:
                 f.write('# test content')
 
-            py_files.append(py_file)
+            py_files.append(str(py_file))
 
         class MultiReturnFixer(BaseFixer):
             def __init__(self, path: str, return_values: list[int]) -> None:
@@ -159,14 +160,15 @@ def test_fix_one_directory_or_one_file_empty_directory() -> None:
 def test_fix_one_directory_or_one_file_directory_no_python_files() -> None:
     """Test directory with no Python files."""
     with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
         # Create non-Python files
-        txt_file = os.path.join(temp_dir, 'test.txt')
-        js_file = os.path.join(temp_dir, 'test.js')
+        txt_file = temp_path / 'test.txt'
+        js_file = temp_path / 'test.js'
 
-        with Path(txt_file).open('w', encoding='utf-8') as f:
+        with txt_file.open('w', encoding='utf-8') as f:
             f.write('not python')
 
-        with Path(js_file).open('w', encoding='utf-8') as f:
+        with js_file.open('w', encoding='utf-8') as f:
             f.write('also not python')
 
         fixer = ConcreteFixer(path=temp_dir)
@@ -179,18 +181,19 @@ def test_fix_one_directory_or_one_file_directory_no_python_files() -> None:
 def test_exclude_functionality_with_regex_pattern() -> None:
     """Test exclude functionality with regex pattern."""
     with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
         # Create test files
-        py_file1 = os.path.join(temp_dir, 'test_included.py')
-        py_file2 = os.path.join(temp_dir, 'test_excluded.py')
+        py_file1 = temp_path / 'test_included.py'
+        py_file2 = temp_path / 'test_excluded.py'
 
         # Create subdirectory with Python file (should be excluded
         # by pattern)
-        sub_dir = os.path.join(temp_dir, 'subdir')
-        Path(sub_dir).mkdir(parents=True)
-        py_file3 = os.path.join(sub_dir, 'test.py')
+        sub_dir = temp_path / 'subdir'
+        sub_dir.mkdir(parents=True)
+        py_file3 = sub_dir / 'test.py'
 
-        for py_file in [py_file1, py_file2, py_file3]:
-            with Path(py_file).open('w', encoding='utf-8') as f:
+        for py_file in (py_file1, py_file2, py_file3):
+            with py_file.open('w', encoding='utf-8') as f:
                 f.write('# test content')
 
         # Use regex pattern to exclude files with 'excluded' in
@@ -211,12 +214,13 @@ def test_exclude_functionality_with_regex_pattern() -> None:
 def test_exclude_functionality_with_specific_patterns() -> None:
     """Test exclude functionality with various regex patterns."""
     with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
         # Create test files
-        py_file1 = os.path.join(temp_dir, 'test_included.py')
-        py_file2 = os.path.join(temp_dir, 'test_cli_excluded.py')
+        py_file1 = temp_path / 'test_included.py'
+        py_file2 = temp_path / 'test_cli_excluded.py'
 
-        for py_file in [py_file1, py_file2]:
-            with Path(py_file).open('w', encoding='utf-8') as f:
+        for py_file in (py_file1, py_file2):
+            with py_file.open('w', encoding='utf-8') as f:
                 f.write('# test content')
 
         # Use regex pattern to exclude files with 'cli_excluded' in name
@@ -236,12 +240,13 @@ def test_exclude_functionality_with_specific_patterns() -> None:
 def test_exclude_patterns_empty() -> None:
     """Test that empty exclude patterns work correctly."""
     with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
         # Create test files
-        py_file1 = os.path.join(temp_dir, 'test1.py')
-        py_file2 = os.path.join(temp_dir, 'test2.py')
+        py_file1 = temp_path / 'test1.py'
+        py_file2 = temp_path / 'test2.py'
 
-        for py_file in [py_file1, py_file2]:
-            with Path(py_file).open('w', encoding='utf-8') as f:
+        for py_file in (py_file1, py_file2):
+            with py_file.open('w', encoding='utf-8') as f:
                 f.write('# test content')
 
         # Empty exclude pattern should process all files

@@ -33,7 +33,7 @@ def test_init() -> None:
 def test_fix_one_directory_or_one_file_single_file() -> None:
     """Test fixing a single file."""
     with tempfile.NamedTemporaryFile(
-        mode='w', suffix='.py', delete=False
+        mode='w', suffix='.py', delete=False, encoding='utf-8'
     ) as f:
         f.write('# test content')
         temp_filename = f.name
@@ -85,7 +85,7 @@ def test_fix_one_directory_or_one_file_directory() -> None:
 
 
 @pytest.mark.parametrize(
-    'return_values,expected_result',
+    ('return_values', 'expected_result'),
     [
         ([0, 0, 0], 0),  # All files successful
         ([1, 0, 0], 1),  # One file failed
@@ -100,7 +100,7 @@ def test_fix_one_directory_or_one_file_directory_mixed_results(
         temp_path = Path(temp_dir)
         # Create test files
         py_files: list[str] = []
-        for i, _return_val in enumerate(return_values):
+        for i in range(len(return_values)):
             py_file = temp_path / f'test{i}.py'
             with py_file.open('w', encoding='utf-8') as f:
                 f.write('# test content')
@@ -113,7 +113,7 @@ def test_fix_one_directory_or_one_file_directory_mixed_results(
                 self.return_values = return_values
                 self.call_count = 0
 
-            def fix_one_file(self, filename: str) -> int:
+            def fix_one_file(self, filename: str) -> int:  # noqa: ARG002
                 self.call_count += 1
                 return self.return_values[self.call_count - 1]
 
@@ -263,7 +263,7 @@ def test_exclude_patterns_empty() -> None:
 def test_exclude_single_file() -> None:
     """Test that single files can be excluded."""
     with tempfile.NamedTemporaryFile(
-        mode='w', suffix='.py', delete=False
+        mode='w', suffix='.py', delete=False, encoding='utf-8'
     ) as f:
         f.write('# test content')
         temp_filename = f.name
@@ -289,7 +289,7 @@ def test_exclude_single_file() -> None:
 def test_exclude_single_file_not_matching_pattern() -> None:
     """Test that single files not matching pattern are processed."""
     with tempfile.NamedTemporaryFile(
-        mode='w', suffix='.py', delete=False
+        mode='w', suffix='.py', delete=False, encoding='utf-8'
     ) as f:
         f.write('# test content')
         temp_filename = f.name

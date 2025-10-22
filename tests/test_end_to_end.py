@@ -2,11 +2,10 @@
 
 import shutil
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
-
-from collections.abc import Callable
 
 from blank_line_after_blocks.main_jupyter import main as main_jupyter
 from blank_line_after_blocks.main_py import main as main_py
@@ -75,7 +74,7 @@ def test_formatter_on_file(
 
     # Copy the before file to a temporary location
     with tempfile.NamedTemporaryFile(
-        mode='w', suffix=suffix, delete=False
+        mode='w', suffix=suffix, delete=False, encoding='utf-8'
     ) as temp_file:
         temp_file.write(before_file.read_text())
         temp_filename = temp_file.name
@@ -89,7 +88,7 @@ def test_formatter_on_file(
             exit_code = e.code
 
         # Read the formatted content
-        with Path(temp_filename).open() as f:
+        with Path(temp_filename).open(encoding='utf-8') as f:
             formatted_content = f.read()
 
         # Get expected content
@@ -143,8 +142,8 @@ def test_directory_processing_py(test_data_dir: Path) -> None:
             expected_file = test_data_dir / 'after' / before_file.name
 
             with (
-                Path(temp_file_path).open() as temp_f,
-                Path(expected_file).open() as expected_f,
+                Path(temp_file_path).open(encoding='utf-8') as temp_f,
+                Path(expected_file).open(encoding='utf-8') as expected_f,
             ):
                 assert temp_f.read() == expected_f.read(), (
                     f'Directory processing failed for {before_file.name}'
@@ -180,8 +179,8 @@ def test_directory_processing_ipynb(test_data_dir: Path) -> None:
             expected_file = test_data_dir / 'after' / before_file.name
 
             with (
-                Path(temp_file_path).open() as temp_f,
-                Path(expected_file).open() as expected_f,
+                Path(temp_file_path).open(encoding='utf-8') as temp_f,
+                Path(expected_file).open(encoding='utf-8') as expected_f,
             ):
                 assert temp_f.read() == expected_f.read(), (
                     f'Directory processing failed for {before_file.name}'
@@ -199,7 +198,7 @@ def test_no_changes_files_return_zero(test_data_dir: Path) -> None:
         before_file = test_data_dir / 'before' / filename
 
         with tempfile.NamedTemporaryFile(
-            mode='w', suffix='.py', delete=False
+            mode='w', suffix='.py', delete=False, encoding='utf-8'
         ) as temp_file:
             temp_file.write(before_file.read_text())
             temp_filename = temp_file.name
@@ -214,7 +213,7 @@ def test_no_changes_files_return_zero(test_data_dir: Path) -> None:
             assert exit_code == 0, f'Expected no changes for {filename}'
 
             # Verify content is unchanged
-            with Path(temp_filename).open() as f:
+            with Path(temp_filename).open(encoding='utf-8') as f:
                 content = f.read()
 
             assert content == before_file.read_text(), (
@@ -238,7 +237,7 @@ def test_files_requiring_changes_return_one(test_data_dir: Path) -> None:
         before_file = test_data_dir / 'before' / filename
 
         with tempfile.NamedTemporaryFile(
-            mode='w', suffix='.py', delete=False
+            mode='w', suffix='.py', delete=False, encoding='utf-8'
         ) as temp_file:
             temp_file.write(before_file.read_text())
             temp_filename = temp_file.name
@@ -253,7 +252,7 @@ def test_files_requiring_changes_return_one(test_data_dir: Path) -> None:
             assert exit_code == 1, f'Expected changes for {filename}'
 
             # Verify content actually changed
-            with Path(temp_filename).open() as f:
+            with Path(temp_filename).open(encoding='utf-8') as f:
                 content = f.read()
 
             assert content != before_file.read_text(), (
@@ -269,7 +268,7 @@ def test_exit_zero_flag(test_data_dir: Path) -> None:
     before_file = test_data_dir / 'before' / 'basic_if.py'
 
     with tempfile.NamedTemporaryFile(
-        mode='w', suffix='.py', delete=False
+        mode='w', suffix='.py', delete=False, encoding='utf-8'
     ) as temp_file:
         temp_file.write(before_file.read_text())
         temp_filename = temp_file.name
@@ -293,7 +292,7 @@ def test_multiple_files(test_data_dir: Path) -> None:
         for filename in filenames:
             before_file = test_data_dir / 'before' / filename
             with tempfile.NamedTemporaryFile(
-                mode='w', suffix='.py', delete=False
+                mode='w', suffix='.py', delete=False, encoding='utf-8'
             ) as temp_file:
                 temp_file.write(before_file.read_text())
                 temp_files.append(temp_file.name)
@@ -313,8 +312,8 @@ def test_multiple_files(test_data_dir: Path) -> None:
         for i, filename in enumerate(filenames):
             expected_file = test_data_dir / 'after' / filename
             with (
-                Path(temp_files[i]).open() as temp_f,
-                Path(expected_file).open() as expected_f,
+                Path(temp_files[i]).open(encoding='utf-8') as temp_f,
+                Path(expected_file).open(encoding='utf-8') as expected_f,
             ):
                 assert temp_f.read() == expected_f.read(), (
                     f'Multiple file processing failed for {filename}'

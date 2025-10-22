@@ -109,7 +109,7 @@ def test_fix_one_file_parse_error(
         mock_parser_class: MagicMock, fixer: JupyterNotebookFixer
 ) -> None:
     """Test fix_one_file when notebook parsing fails."""
-    mock_parser_class.side_effect = Exception('Parse error')
+    mock_parser_class.side_effect = ValueError('Parse error')
 
     # Create a temporary file so the file existence check passes
     with tempfile.NamedTemporaryFile(

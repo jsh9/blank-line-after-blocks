@@ -4,6 +4,8 @@ exclude = ["tests/test_data"]
 line-length = 79
 target-version = "py310"
 
+output-format = "grouped"
+
 [format]
 docstring-code-format = true
 preview = true

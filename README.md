@@ -9,18 +9,19 @@ ______________________________________________________________________
 
 **Table of Contents**
 
-- [1. Installation](#1-installation)
-- [2. Usage](#2-usage)
-  - [2.1. Command Line](#21-command-line)
-  - [2.2. Pre-commit Hook](#22-pre-commit-hook)
-    - [2.2.1. Pre-commit with exclude patterns](#221-pre-commit-with-exclude-patterns)
-  - [2.3. Configuration File](#23-configuration-file)
-- [3. What it does](#3-what-it-does)
-- [4. Examples](#4-examples)
-  - [4.1. Basic if and for blocks](#41-basic-if-and-for-blocks)
-  - [4.2. Try/except blocks with context managers](#42-tryexcept-blocks-with-context-managers)
-  - [4.3. Nested blocks in class methods](#43-nested-blocks-in-class-methods)
-  - [4.4. Compound blocks stay tight (no blank line before else/elif/except/finally)](#44-compound-blocks-stay-tight-no-blank-line-before-elseelifexceptfinally)
+- [blank-line-after-blocks](#blank-line-after-blocks)
+  - [1. Installation](#1-installation)
+  - [2. Usage](#2-usage)
+    - [2.1. Command Line](#21-command-line)
+    - [2.2. Pre-commit Hook](#22-pre-commit-hook)
+      - [2.2.1. Pre-commit with exclude patterns](#221-pre-commit-with-exclude-patterns)
+    - [2.3. Configuration File](#23-configuration-file)
+  - [3. What it does](#3-what-it-does)
+  - [4. Examples](#4-examples)
+    - [4.1. Basic if and for blocks](#41-basic-if-and-for-blocks)
+    - [4.2. Try/except blocks with context managers](#42-tryexcept-blocks-with-context-managers)
+    - [4.3. Nested blocks in class methods](#43-nested-blocks-in-class-methods)
+    - [4.4. Compound blocks stay tight (no blank line before else/elif/except/finally)](#44-compound-blocks-stay-tight-no-blank-line-before-elseelifexceptfinally)
 
 ______________________________________________________________________
 
@@ -71,7 +72,7 @@ repos:
     rev: <LATEST_TAG>
     hooks:
       - id: blank-line-after-blocks
-        args: ["--exclude", "tests/|_generated\.py$"]
+        args: ["--exclude", r"tests/|_generated\.py$"]
       - id: blank-line-after-blocks-jupyter
         args: ["--exclude", "notebooks/generated/"]
 ```

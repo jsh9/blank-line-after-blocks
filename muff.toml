@@ -66,7 +66,7 @@ extend-select = [
   "W", # pycodestyle: warning
 ]
 ignore = [
-  "ANN401",
+  "ANN401", # no need to ban the `Any` type
   "D100",
   "D104",
   "D105",
@@ -74,10 +74,10 @@ ignore = [
   "D200",
   "D205",
   "D400",
-  "PLC1901", # compare with empty string
-  "S101",
-  "S110",
-  "TD002",
+  "PLC1901", # it's fine to compare with empty string
+  "S101", # it's fine to use assert
+  "S110", # it's fine to use "try-except-pass"
+  "TD002", # no need to add author name in TODO comments
   "TRY003", # we can allow on-the-fly exception messages
 ]
 preview = true
@@ -95,6 +95,15 @@ ban-relative-imports = "all"
 [lint.mccabe]
 max-complexity = 14
 
+[lint.pep8-naming]
+extend-ignore-names = [
+  # glob patterns, not regex
+  "*LLM_*",
+  "*LaaJ_*",
+  "*_LLM*",
+  "*_LaaJ*",
+]
+
 [lint.per-file-ignores]
 "tests/*" = [
   "D101", # no need for docstrings in tests
@@ -102,6 +111,7 @@ max-complexity = 14
   "D103",
   "PLC2701", # importing private functions is allowed in tests
   "PLR2004", # using magic numbers is allowed in tests
+  "SLF001", # accessing private functions is allowed in tests
 ]
 
 [lint.pydocstyle]

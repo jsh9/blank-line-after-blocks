@@ -71,7 +71,7 @@ repos:
     rev: <LATEST_TAG>
     hooks:
       - id: blank-line-after-blocks
-        args: ["--exclude", "tests/|_generated\.py$"]
+        args: ["--exclude", r"tests/|_generated\.py$"]
       - id: blank-line-after-blocks-jupyter
         args: ["--exclude", "notebooks/generated/"]
 ```

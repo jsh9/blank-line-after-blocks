@@ -10,8 +10,7 @@ from jupyter_notebook_parser import (
     reconstruct_source,
 )
 
-import blank_line_after_blocks.helper as helper
-from blank_line_after_blocks import __version__
+from blank_line_after_blocks import __version__, helper
 from blank_line_after_blocks.base_fixer import BaseFixer
 
 
@@ -30,8 +29,6 @@ class JupyterNotebookFixer(BaseFixer):
         Fix formatting in a single file or all Jupyter notebook files in a
         directory.
         """
-        from pathlib import Path
-
         path_obj = Path(self.path)
 
         if path_obj.is_file():
@@ -46,7 +43,8 @@ class JupyterNotebookFixer(BaseFixer):
 
         return 0 if not all_status or all_status == {0} else 1
 
-    def fix_one_file(self, filename: str) -> int:
+    @staticmethod
+    def fix_one_file(filename: str) -> int:
         """Fix formatting in a single Jupyter notebook file."""
         file_path = Path(filename)
         if not file_path.is_file():
@@ -60,8 +58,8 @@ class JupyterNotebookFixer(BaseFixer):
             code_cells = parsed.get_code_cells()
             code_cell_indices = parsed.get_code_cell_indices()
             code_cell_sources = parsed.get_code_cell_sources()
-        except Exception as exc:
-            print(f'Error reading {filename}: {str(exc)}', file=sys.stderr)
+        except (NameError, ValueError) as exc:
+            print(f'Error reading {filename}: {exc!s}', file=sys.stderr)
             return 1
         else:
             ret_val = 0
@@ -85,7 +83,7 @@ class JupyterNotebookFixer(BaseFixer):
 
             if ret_val == 1:
                 print(f'Rewriting {filename}', file=sys.stderr)
-                with open(filename, 'w') as fp:
+                with Path(filename).open('w', encoding='utf-8') as fp:
                     json.dump(parsed.notebook_content, fp, indent=1)
                     # Jupyter notebooks (.ipynb) always ends with a new line
                     # but json.dump does not.

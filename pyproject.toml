@@ -1,126 +1,90 @@
 [build-system]
-requires = ["setuptools>=45", "setuptools-scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
+requires = ["setuptools-scm[toml]>=6.2", "setuptools>=45"]
 
 [project]
 name = "blank-line-after-blocks"
-version = "0.1.4"
-description = "A Python formatter to automatically add blank lines after if/for/while/with/try blocks"
-readme = "README.md"
-license = {text = "MIT"}
+version = "0.1.5"
+dependencies = [
+  "click>=8.0",
+  "jupyter-notebook-parser>=0.1.4",
+]
+requires-python = ">=3.10"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+  {name = "Your Name", email = "your.email@example.com"},
 ]
 maintainers = [
-    {name = "Your Name", email = "your.email@example.com"}
+  {name = "Your Name", email = "your.email@example.com"},
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Environment :: Console",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Software Development :: Code Generators",
-    "Topic :: Software Development :: Quality Assurance",
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python",
+  "Topic :: Software Development :: Code Generators",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: Quality Assurance",
 ]
-keywords = ["formatter", "code-style", "blank-lines", "python"]
-requires-python = ">=3.10"
-dependencies = [
-    "jupyter-notebook-parser>=0.1.4",
-    "click>=8.0",
-]
+description = "A Python formatter to automatically add blank lines after if/for/while/with/try blocks"
+keywords = ["blank-lines", "code-style", "formatter", "python"]
+license = {text = "MIT"}
+readme = "README.md"
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=6.0",
-    "pytest-cov",
-    "mypy",
-    "pre-commit",
-    "tox",
-]
-lint = [
-    "flake8>=5.0",
-    "flake8-bugbear",
-    "flake8-comprehensions",
-    "flake8-eradicate",
-    "flake8-broken-line",
-    "flake8-quotes",
-    "flake8-debugger",
-    "flake8-length",
-    "flake8-clean-block",
-    "flake8-indent-in-def",
-    "flake8-picky-parentheses",
-    "flake8-implicit-str-concat",
-    "flake8-return",
-    "flake8-docstrings",
+  "mypy",
+  "pre-commit",
+  "pytest-cov",
+  "pytest>=6.0",
+  "tox",
 ]
 format = [
-    "muff",
+  "muff",
 ]
-
-[project.urls]
-Homepage = "https://github.com/jsh9/blank-line-after-blocks"
-Repository = "https://github.com/jsh9/blank-line-after-blocks.git"
-Issues = "https://github.com/jsh9/blank-line-after-blocks/issues"
-Changelog = "https://github.com/jsh9/blank-line-after-blocks/blob/main/CHANGELOG.md"
 
 [project.scripts]
 blank-line-after-blocks = "blank_line_after_blocks.main_py:main"
 blank-line-after-blocks-jupyter = "blank_line_after_blocks.main_jupyter:main"
 
-[tool.setuptools.packages.find]
-exclude = ["tests*", "testing*"]
+[project.urls]
+Changelog = "https://github.com/jsh9/blank-line-after-blocks/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/jsh9/blank-line-after-blocks"
+Issues = "https://github.com/jsh9/blank-line-after-blocks/issues"
+Repository = "https://github.com/jsh9/blank-line-after-blocks.git"
+
+[tool.mypy]
+strict = true
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "jupyter_notebook_parser"
+
+# Test configuration
+[tool.pytest.ini_options]
+addopts = [
+  "--strict-config",
+  "--strict-markers",
+  "--tb=short",
+]
+markers = [
+  "integration: marks tests as integration tests",
+]
+minversion = "6.0"
+python_classes = ["Test*"]
+python_files = ["*_test.py", "test_*.py"]
+python_functions = ["test_*"]
+testpaths = ["tests"]
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
 
-# Test configuration
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--tb=short",
-]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-markers = [
-    "integration: marks tests as integration tests",
-]
-
-[tool.mypy]
-strict = true
-exclude = "pydoclint/utils/unparser.py"
-
-[[tool.mypy.overrides]]
-module = "jupyter_notebook_parser"
-ignore_missing_imports = true
-
-# Flake8 configuration (using flake8 section for compatibility)
-[tool.flake8]
-max-line-length = 79
-extend-ignore = [
-    "E501",  # line length
-    "W503",  # line break before binary operator
-]
-count = true
-statistics = true
-max-complexity = 10
-exclude = [
-    ".*",
-    "build/*",
-    "venv/*",
-    "tests/test_data/*",
-]
+[tool.setuptools.packages.find]
+exclude = ["testing*", "tests*"]

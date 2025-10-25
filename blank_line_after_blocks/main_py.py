@@ -6,8 +6,7 @@ from pathlib import Path
 
 import click
 
-import blank_line_after_blocks.helper as helper
-from blank_line_after_blocks import __version__
+from blank_line_after_blocks import __version__, helper
 from blank_line_after_blocks.base_fixer import BaseFixer
 
 
@@ -21,7 +20,8 @@ class PythonFileFixer(BaseFixer):
     ) -> None:
         super().__init__(path=path, exclude_pattern=exclude_pattern)
 
-    def fix_one_file(self, filename: str) -> int:
+    @staticmethod
+    def fix_one_file(filename: str) -> int:
         """Fix formatting in a single Python file."""
         if filename == '-':
             source_bytes = sys.stdin.buffer.read()
@@ -32,7 +32,7 @@ class PythonFileFixer(BaseFixer):
                 print(msg, file=sys.stderr)
                 return 0
 
-            with open(filename, 'rb') as fb:
+            with Path(filename).open('rb') as fb:
                 source_bytes = fb.read()
 
         try:
@@ -48,7 +48,7 @@ class PythonFileFixer(BaseFixer):
             print(source_text, end='')
         elif source_text != source_text_orig:
             print(f'Rewriting {filename}', file=sys.stderr)
-            with open(filename, 'wb') as f:
+            with Path(filename).open('wb') as f:
                 f.write(source_text.encode())
 
         return source_text != source_text_orig

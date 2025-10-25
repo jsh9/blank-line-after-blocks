@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import ast
 import re
-from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def fix_src(source_code: str) -> str:
@@ -50,10 +53,9 @@ def _collect_blocks_to_fix(tree: ast.Module) -> set[int]:
                     and node.orelse[-1].end_lineno is not None
                 ):
                     blocks_to_fix.add(node.orelse[-1].end_lineno)
-            else:
-                # For other blocks, add blank line after entire construct
-                if hasattr(node, 'end_lineno') and node.end_lineno is not None:
-                    blocks_to_fix.add(node.end_lineno)
+            # For other blocks, add blank line after entire construct
+            elif hasattr(node, 'end_lineno') and node.end_lineno is not None:
+                blocks_to_fix.add(node.end_lineno)
 
     return blocks_to_fix
 
@@ -66,7 +68,7 @@ def _add_blank_lines(lines: list[str], blocks_to_fix: set[int]) -> str:
         result.append(line)
         current_line_num = i + 1
 
-        if current_line_num in blocks_to_fix:
+        if current_line_num in blocks_to_fix:  # noqa: SIM102
             # Check if next line exists and is not already blank
             if i + 1 < len(lines):
                 next_line = lines[i + 1].strip()

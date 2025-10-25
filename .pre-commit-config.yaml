@@ -57,16 +57,16 @@ repos:
           - --indent=4
           - --no-sort-keys
           - --no-eof-newline
-  - repo: https://github.com/jsh9/markdown-toc-creator
-    rev: 0.1.0
-    hooks:
-      - id: markdown-toc-creator
-        exclude: ^AGENTS\.md$|^CHANGELOG\.md$
   - repo: https://github.com/jsh9/markdown-heading-numbering
     rev: 0.1.0
     hooks:
       - id: markdown-heading-numbering
         exclude: ^CHANGELOG\.md$
+  - repo: https://github.com/jsh9/markdown-toc-creator
+    rev: 0.1.0
+    hooks:
+      - id: markdown-toc-creator
+        exclude: ^AGENTS\.md$|^CHANGELOG\.md$
   - repo: https://github.com/jsh9/format-docstring
     rev: 0.2.2
     hooks:
